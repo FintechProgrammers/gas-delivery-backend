@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, GeneratesUuid, SoftDeletes;
+    use HasFactory,HasApiTokens, Notifiable, GeneratesUuid, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -63,7 +64,6 @@ class User extends Authenticatable
         });
 
         static::created(function ($user) {
-            UserInfo::create(['user_id' => $user->id]);
             Wallet::create(['user_id' => $user->id, 'amount' => 0]);
         });
     }
