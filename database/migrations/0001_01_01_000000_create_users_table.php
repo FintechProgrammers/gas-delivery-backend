@@ -14,13 +14,22 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
-            $table->string('name');
+            $table->string('first_name');
+            $table->string('last_name');
             $table->string('email')->unique()->nullable();
-            $table->string('username')->unique();
-            $table->boolean('is_ambassador')->default(false);
+            $table->string('phone_number')->unique();
+            $table->bigInteger('bvn')->unique()->nullable();
+            $table->boolean('is_vendor')->default(false);
             $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('phone_number_verified_at')->nullable();
+            $table->timestamp('bvn_verified_at')->nullable();
+            $table->timestamp('kyc_verified_at')->nullable();
             $table->string('password');
             $table->string('profile_image')->nullable();
+            $table->string('date_of_birth')->nullable();
+            $table->string('referral_code')->nullable();
+            $table->foreignId('parent_id')->nullable();
+            $table->string('transaction_pin')->nullable();
             $table->string('status')->default(\App\Enums\UserStatus::ACTIVE);
             $table->rememberToken();
             $table->softDeletes();

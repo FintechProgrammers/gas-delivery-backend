@@ -127,6 +127,11 @@ class User extends Authenticatable
         return $this->hasMany(UserActivities::class, 'user_id', 'id')->latest();
     }
 
+    function bankAccounts()
+    {
+        return $this->hasMany(BankAccount::class, 'user_id')->latest();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -135,6 +140,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'transaction_pin'
     ];
 
     /**
@@ -146,7 +152,11 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_number_verified_at' => 'datetime',
+            'bvn_verified_at' => 'datetime',
+            'kyc_verified_at' => 'datetime',
             'password' => 'hashed',
+            'transaction_pin' => 'hashed'
         ];
     }
 }
