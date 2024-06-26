@@ -20,4 +20,9 @@ class DeliveryAddress extends Model
     {
         return 'uuid';
     }
+
+    function country()
+    {
+        return $this->hasOne(Country::class,'id','country_id');
+    }
 }

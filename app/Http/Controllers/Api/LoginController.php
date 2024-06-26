@@ -44,7 +44,7 @@ class LoginController extends Controller
 
             return $this->sendResponse($data, "Login successfully.", 201);
         } catch (\Exception $e) {
-            // DB::rollBack();
+            DB::rollBack();
 
             sendToLog($e);
 
