@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'referral_code' => $this->ferral_code,
             'date_of_birth' => $this->date_of_birth,
             'phone_number' => $this->phone_number,
+            'profile_image' => $this->profile_picture,
             'phone_number_verified' => (bool) !empty($this->phone_number_verified_at) ? true : false,
             'email_verified'         => (bool) !empty($this->email_verified_at) ? true : false,
             'status'                => $this->status

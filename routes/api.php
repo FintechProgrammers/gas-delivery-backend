@@ -25,6 +25,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
         Route::get('', 'index');
+        Route::patch('', 'update');
+        Route::patch('/update/photo', 'updateProfilePhoto');
     });
 });
 

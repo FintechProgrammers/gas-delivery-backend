@@ -45,11 +45,6 @@ class User extends Authenticatable
         return 'uuid';
     }
 
-    function userProfile()
-    {
-        return $this->hasOne(UserInfo::class, 'user_id');
-    }
-
     public function getProfilePictureAttribute(): string
     {
         return !empty($this->profile_image) ? $this->profile_image : url('/') . '/assets/images/avatar.svg';
