@@ -7,8 +7,10 @@ use App\Http\Controllers\Api\Business\RegisterController as BusinessRegisterCont
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DeliveryAddressController;
+use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\VendorController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,6 +38,17 @@ Route::middleware(['auth:api'])->group(function () {
         Route::patch('', 'update');
         Route::patch('/update/photo', 'updateProfilePhoto');
         Route::patch('/business/update', 'updateBusinessProfile');
+    });
+
+    Route::prefix('gas')->group(function () {
+        Route::controller(GasPriceController::class)->group(function () {
+            Route::get('/price/list', 'index');
+        });
+
+        Route::controller(VendorController::class)->prefix('vendors')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{user}', 'show');
+        });
     });
 
     Route::prefix('business')->group(function () {

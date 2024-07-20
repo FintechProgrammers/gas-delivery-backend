@@ -18,7 +18,7 @@ class GasPriceResource extends JsonResource
             'id' => $this->uuid,
             'price' => $this->price,
             'formatted_price' => number_format($this->price, 2, '.', ',') . ' NGN',
-            'business' => new UserResource($this->business)
+            'vendor' => new VendorResource($this->business)
         ];
     }
 }

@@ -139,6 +139,11 @@ class User extends Authenticatable
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
     }
 
+    function pricing()
+    {
+        return $this->hasOne(GasPricing::class, 'business_id', 'id')->latest();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
