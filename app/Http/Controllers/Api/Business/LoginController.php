@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Business;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\BusinessLoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
-    function __invoke(LoginRequest $request)
+    function __invoke(BusinessLoginRequest $request)
     {
         try {
             DB::beginTransaction();
 
             $validated = $request->validated();
 
-            $user = User::where('phone_number', $validated['phone_number'])->where('is_business', false)->first();
+            $user = User::where('email', $validated['email'])->where('is_business', true)->first();
 
             if (!$user) {
                 return $this->sendError("Invalid login credentials", [], 404);

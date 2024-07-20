@@ -14,7 +14,7 @@ use Laravel\Passport\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory,HasApiTokens, Notifiable, GeneratesUuid, SoftDeletes;
+    use HasFactory, HasApiTokens, Notifiable, GeneratesUuid, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -50,6 +50,11 @@ class User extends Authenticatable
         return !empty($this->profile_image) ? $this->profile_image : url('/') . '/assets/images/avatar.svg';
     }
 
+    public function getAccountTypeAttribute(): string
+    {
+        return $this->is_business ? "BUSINESS" : "PERSONAL";
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -59,8 +64,15 @@ class User extends Authenticatable
         });
 
         static::created(function ($user) {
-            Wallet::create(['user_id' => $user->id, 'amount' => 0]);
+            if ($user->is_business) {
+                BusinessInfo::create(['user_id' => $user->id]);
+            }
         });
+    }
+
+    function businessProfile()
+    {
+        return $this->hasOne(BusinessInfo::class, 'user_id', 'id');
     }
 
     public static function generateReferralCode()
@@ -107,7 +119,7 @@ class User extends Authenticatable
         return ($filledFields / $totalFields) * 100;
     }
 
-    function bonuWallet()
+    function bonusWallet()
     {
         return $this->hasOne(Bonus::class, 'user_id', 'id');
     }

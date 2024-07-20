@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateBusinessDetails;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
@@ -34,6 +35,33 @@ class ProfileController extends Controller
             ]));
 
             return $this->sendResponse([], "Profile updated successfully", 201);
+        } catch (\Exception $e) {
+
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function updateBusinessProfile(UpdateBusinessDetails $request)
+    {
+        $validated = $request->validated();
+
+        try {
+            $user = $request->user();
+
+            $businessProfile = $user->businessProfile;
+
+            $businessProfile->update(array_filter([
+                'business_name' => array_key_exists('business_name', $validated) && !empty($validated['business_name']) ? $validated['business_name'] : $businessProfile->business_name,
+                'date_incorporated' => array_key_exists('date_incorporated', $validated) && !empty($validated['date_incorporated']) ? $validated['date_incorporated'] : $businessProfile->date_incorporated,
+                'office_address'   => array_key_exists('office_address', $validated) && !empty($validated['office_address']) ? $validated['office_address'] : $businessProfile->office_address,
+                'longitude' => array_key_exists('longitude', $validated) && !empty($validated['longitude']) ? $validated['longitude'] : $businessProfile->longitude,
+                'latitude' => array_key_exists('latitude', $validated) && !empty($validated['latitude']) ? $validated['latitude'] : $businessProfile->latitude,
+                'opening_hours' => array_key_exists('opening_hours', $validated) && !empty($validated['opening_hours']) ? $validated['opening_hours'] : $businessProfile->opening_hours,
+            ]));
+
+            return $this->sendResponse([], "Business Profile updated successfully", 201);
         } catch (\Exception $e) {
 
             sendToLog($e);
