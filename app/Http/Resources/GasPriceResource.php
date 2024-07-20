@@ -14,6 +14,11 @@ class GasPriceResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->uuid,
+            'price' => $this->price,
+            'formatted_price' => number_format($this->price, 2, '.', ',') . ' NGN',
+            'business' => new UserResource($this->business)
+        ];
     }
 }

@@ -38,10 +38,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::patch('/business/update', 'updateBusinessProfile');
     });
 
-    Route::prefix('business')->prefix(function () {
+    Route::prefix('business')->group(function () {
         Route::controller(GasPricingController::class)->prefix('pricing')->group(function () {
             Route::get('/', 'index');
-            Route::post('', 'store');
+            Route::post('/', 'store');
         });
     });
 

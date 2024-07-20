@@ -11,7 +11,7 @@ class GasPriceRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,8 @@ class GasPriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'price' => ['required', 'numeric'],
+            'kg' => ['sometimes', 'numeric']
         ];
     }
 }

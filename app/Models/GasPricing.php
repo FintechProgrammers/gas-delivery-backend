@@ -11,4 +11,9 @@ class GasPricing extends Model
     use HasFactory, GeneratesUuid;
 
     protected $guarded = [];
+
+    function business()
+    {
+        return $this->belongsTo(User::class, 'business_id', 'id');
+    }
 }
