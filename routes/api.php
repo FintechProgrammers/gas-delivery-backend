@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -22,9 +23,18 @@ Route::prefix('auth')->group(function () {
         Route::post('/register', BusinessRegisterController::class);
         Route::post('/login', BusinessLoginController::class);
     });
+
+    Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
+    Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
 });
 
 Route::middleware(['auth:api'])->group(function () {
+
+    Route::controller(VerifyPhoneNumberController::class)->prefix('phone-number')->group(function () {
+        Route::post('/token/request', 'requestToken');
+        Route::post('/verify', 'verifyPhoneNumber');
+    });
+
     Route::controller(DeliveryAddressController::class)->prefix('delivery/address')->group(function () {
         Route::get('', 'index');
         Route::post('', 'store');

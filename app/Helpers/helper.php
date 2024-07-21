@@ -262,3 +262,24 @@ if (!function_exists('systemSettings')) {
         return Settings::first();
     }
 }
+
+if (!function_exists('formatPhoneNumber')) {
+    function formatPhoneNumber($phoneNumber)
+    {
+        // Remove any spaces, dashes, or parentheses
+        $phoneNumber = preg_replace('/\s+|-|\(|\)/', '', $phoneNumber);
+
+        // Check if the phone number already starts with +234
+        if (substr($phoneNumber, 0, 4) !== '+234') {
+            // Check if the phone number starts with 0 and replace it with +234
+            if (substr($phoneNumber, 0, 1) === '0') {
+                $phoneNumber = '+234' . substr($phoneNumber, 1);
+            } else {
+                // If the phone number does not start with 0, add +234 to the beginning
+                $phoneNumber = '+234' . $phoneNumber;
+            }
+        }
+
+        return $phoneNumber;
+    }
+}

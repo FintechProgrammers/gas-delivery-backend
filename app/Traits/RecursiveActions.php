@@ -25,12 +25,16 @@ trait RecursiveActions
     {
         $otp = $this->generateOtpCode();
 
-        UserOtp::create([
-            'user_id' => $userId,
-            'token' => $otp,
-            'created_at' => Carbon::now(),
-            'purpose' => $purpose,
-        ]);
+        UserOtp::updateOrCreate(
+            [
+                'user_id' => $userId,
+                'purpose' => $purpose,
+            ],
+            [
+                'token' => $otp,
+                'created_at' => Carbon::now(),
+            ]
+        );
 
         return $otp;
     }

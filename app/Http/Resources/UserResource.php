@@ -26,7 +26,7 @@ class UserResource extends JsonResource
             'profile_image' => $this->profile_picture,
             'phone_number_verified' => (bool) !empty($this->phone_number_verified_at) ? true : false,
             'email_verified'        => (bool) !empty($this->email_verified_at) ? true : false,
-            'status'                => GasPriceResource::collection($this->pricing)
+            'status'                => $this->status
         ];
     }
 }

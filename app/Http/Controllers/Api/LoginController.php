@@ -6,11 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Notifications\AuthToken;
+use App\Traits\RecursiveActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class LoginController extends Controller
 {
+    use RecursiveActions;
+
     function __invoke(LoginRequest $request)
     {
         try {
@@ -18,7 +22,7 @@ class LoginController extends Controller
 
             $validated = $request->validated();
 
-            $user = User::where('phone_number', $validated['phone_number'])->where('is_business', false)->first();
+            $user = User::where('phone_number', formatPhoneNumber($validated['phone_number']))->where('is_business', false)->first();
 
             if (!$user) {
                 return $this->sendError("Invalid login credentials", [], 404);
@@ -28,6 +32,10 @@ class LoginController extends Controller
             if (in_array($user->status, ['blocked', 'suspended'], true)) {
                 return $this->sendError("Your account has been restricted. Please contact our support team for assistance.", [], 401);
             }
+
+            $code = $this->generateUserOtp($user->id, "auth_otp");
+
+            $user->notify(new AuthToken($code));
 
             $token = $user->createToken('auth_token')->accessToken;
 

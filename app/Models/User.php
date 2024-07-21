@@ -139,6 +139,11 @@ class User extends Authenticatable
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
     }
 
+    public function routeNotificationForWhatsApp()
+    {
+        return $this->phone_number;
+    }
+
     function pricing()
     {
         return $this->hasOne(GasPricing::class, 'business_id', 'id')->latest();
