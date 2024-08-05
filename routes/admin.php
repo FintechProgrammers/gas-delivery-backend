@@ -4,22 +4,15 @@ use App\Http\Controllers\Admin\AdministrativeUserController;
 use App\Http\Controllers\Admin\Auth\AdminForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\AdminResetPasswordController;
 use App\Http\Controllers\Admin\BannerController;
-use App\Http\Controllers\Admin\CommisionPlanController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\LoginController;
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\RankController;
 use App\Http\Controllers\Admin\RoleController;
-use App\Http\Controllers\Admin\SalesController;
-use App\Http\Controllers\Admin\ServiceManagement;
-use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\SubscriptionsController;
 use App\Http\Controllers\Admin\SupportController;
 use App\Http\Controllers\Admin\UserManagementController;
-use App\Http\Controllers\Admin\WithdrawalController;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('admin.guest')->group(function () {
@@ -109,16 +102,26 @@ Route::middleware('admin.auth')->group(function () {
         Route::get('logout', 'logout')->name('logout');
     });
 
-    Route::controller(BannerController::class)->prefix('banner')->name('banner.')->group(function(){
-        Route::get('','index')->name('index');
-        Route::get('/filter','filter')->name('filter');
-        Route::get('/create','create')->name('create');
-        Route::post('/store','store')->name('store');
-        Route::get('/edit/{banner}','edit')->name('edit');
-        Route::patch('/update/{banner}','update')->name('update');
-        Route::post('/publish/{banner}','publish')->name('publish');
-        Route::post('/unpublish/{banner}','unpublish')->name('unpublish');
-        Route::post('/delete/{banner}','destroy')->name('delete');
+    Route::controller(BannerController::class)->prefix('banner')->name('banner.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
+        Route::get('/create', 'create')->name('create');
+        Route::post('/store', 'store')->name('store');
+        Route::get('/edit/{banner}', 'edit')->name('edit');
+        Route::patch('/update/{banner}', 'update')->name('update');
+        Route::post('/publish/{banner}', 'publish')->name('publish');
+        Route::post('/unpublish/{banner}', 'unpublish')->name('unpublish');
+        Route::post('/delete/{banner}', 'destroy')->name('delete');
+    });
+
+    Route::controller(DeliveryController::class)->prefix('delivery')->name('delivery.')->group(function () {
+        Route::get('index', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+    });
+
+    Route::controller(OrderController::class)->prefix('order')->name('order.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
     });
 
     Route::get('update-countries', [CountryController::class, 'updateCountriesTableWithFlags']);

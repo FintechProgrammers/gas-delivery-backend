@@ -34,6 +34,18 @@ class Navigation
                 ]
             ],
             (object) [
+                'name'  => 'Orders',
+                'route' => 'admin.order.index',
+                'icon'  => 'bx bx-cart-alt',
+                'hasPermission' => true
+            ],
+            (object) [
+                'name'  => 'Deliveries',
+                'route' => 'admin.delivery.index',
+                'icon'  => 'bx bx-cycling',
+                'hasPermission' => true
+            ],
+            (object) [
                 'name'      => 'Supports',
                 'icon'      => 'las la-headset',
                 'routes'    => ['admin.support.subjects.index', 'admin.support.tickets.index'],

@@ -35,10 +35,10 @@ class UserManagementController extends Controller
         $query = $query
             ->when(!empty($search), fn ($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")->orWhere('username', 'LIKE', "%{$search}%"))
             ->when(!empty($status), fn ($query) => $query->where('status', $status))
-            ->when(!empty($accountType), fn ($query) => $accountType == 'ambassador' ? $query->where('is_ambassador', true) : $query->where('is_ambassador', false))
+            ->when(!empty($accountType), fn ($query) => $accountType == 'business' ? $query->where('is_business', true) : $query->where('is_business', false))
             ->when(!empty($dateFrom) && !empty($dateTo), fn ($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
             ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($accountType) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $accountType == 'ambassador' ? $query->where('is_ambassador', true)->whereBetween('created_at', [$dateFrom, $dateTo]) : $query->where('is_ambassador', false)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(!empty($accountType) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $accountType == 'business' ? $query->where('is_business', true)->whereBetween('created_at', [$dateFrom, $dateTo]) : $query->where('is_business', false)->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['users'] = $query->paginate(50);
 

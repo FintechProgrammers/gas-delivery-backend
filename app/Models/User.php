@@ -28,9 +28,9 @@ class User extends Authenticatable
 
     // Define the required fields for the user model and the related userInfo model
     protected $userRequiredFields = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
-        'username',
     ];
 
     protected $userInfoRequiredFields = [
@@ -137,6 +137,14 @@ class User extends Authenticatable
     function bankAccounts()
     {
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
+    }
+
+    /**
+     * Get the full name of the user.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return !empty($this->first_name) ? \Illuminate\Support\Str::title($this->first_name . ' ' . $this->last_name) : 'Unavailable';
     }
 
     public function routeNotificationForWhatsApp()
