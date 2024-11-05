@@ -31,6 +31,7 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'business_name'
     ];
 
     protected $userInfoRequiredFields = [
@@ -63,16 +64,16 @@ class User extends Authenticatable
             $user->referral_code = static::generateReferralCode();
         });
 
-        static::created(function ($user) {
-            if ($user->is_business) {
-                BusinessInfo::create(['user_id' => $user->id]);
-            }
-        });
+        // static::created(function ($user) {
+        //     if ($user->is_business) {
+        //         BusinessInfo::create(['user_id' => $user->id]);
+        //     }
+        // });
     }
 
-    function businessProfile()
+    function profile()
     {
-        return $this->hasOne(BusinessInfo::class, 'user_id', 'id');
+        return $this->hasOne(UserInfo::class, 'user_id', 'id');
     }
 
     public static function generateReferralCode()
@@ -144,7 +145,11 @@ class User extends Authenticatable
      */
     public function getFullNameAttribute(): string
     {
-        return !empty($this->first_name) ? \Illuminate\Support\Str::title($this->first_name . ' ' . $this->last_name) : 'Unavailable';
+        if ($this->is_business) {
+            return !empty($this->business_name) ? \Illuminate\Support\Str::title($this->business_name) : 'Unavailable';
+        } else {
+            return !empty($this->first_name) ? \Illuminate\Support\Str::title($this->first_name . ' ' . $this->last_name) : 'Unavailable';
+        }
     }
 
     public function routeNotificationForWhatsApp()

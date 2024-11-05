@@ -21,10 +21,11 @@ class VendorResource extends JsonResource
 
         return [
             'id' => $this->uuid,
-            'business_name' => $this->businessProfile->business_name,
+            'business_name' => $this->business_name,
             'profile_photo' => $this->profile_picture,
-            'address' => $this->businessProfile->office_address,
-            'opening_hours' => $this->businessProfile->opening_hours,
+            'address' => $this->profile->address,
+            'opening_days' => $this->profile->opening_days,
+            'opening_hours' => $this->profile->opening_hours,
             'pricing' => $price
         ];
     }

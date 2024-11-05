@@ -3,11 +3,12 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class BusinessLoginRequest extends FormRequest
+class VerifyPhoneRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +26,8 @@ class BusinessLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone_number'  => ['required'],
-            'password' => ['required']
+            'phone_number' => ['required'],
+            'token' => ['required', 'digits:4']
         ];
     }
 

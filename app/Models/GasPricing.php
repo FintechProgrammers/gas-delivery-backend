@@ -16,4 +16,12 @@ class GasPricing extends Model
     {
         return $this->belongsTo(User::class, 'business_id', 'id');
     }
+
+    /**
+     * Define the route model binding key for a given model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
 }

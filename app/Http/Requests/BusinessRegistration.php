@@ -27,10 +27,15 @@ class BusinessRegistration extends FormRequest
     {
         return [
             'email' => ['email', 'required', 'unique:users,email'],
-            'first_name' => ['string', 'required'],
-            'last_name' => ['string', 'required'],
+            'phone_number' => ['required', 'unique:users,phone_number'],
+            'business_name' => ['string', 'required'],
+            'token' => ['required', 'digits:4'],
+            'photo' => ['image', 'mimes:jpeg,png,jpg,gif|max:2048'],
             'password' => [
-                'required', 'string', Password::min(8)->mixedCase()->numbers()->symbols(), 'confirmed', // for password confirmation
+                'required',
+                'string',
+                Password::min(8)->mixedCase()->numbers()->symbols(),
+                'confirmed', // for password confirmation
             ],
         ];
     }
@@ -40,10 +45,8 @@ class BusinessRegistration extends FormRequest
         return [
             'email.required' => 'Email is required.',
             'email.email' => 'Email must be a valid email address.',
-            'first_name.required' => 'First name is required.',
-            'first_name.string' => 'First name must be a string.',
-            'last_name.required' => 'Last name is required.',
-            'last_name.string' => 'Last name must be a string.',
+            'business_name.required' => 'First name is required.',
+            'business_name.string' => 'First name must be a string.',
             'password.required' => 'Password is required.',
             'password.string' => 'Password must be a string.',
             'password.min' => 'Password must be at least 8 characters.',

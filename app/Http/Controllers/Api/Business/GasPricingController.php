@@ -14,9 +14,9 @@ class GasPricingController extends Controller
     {
         $user = $request->user();
 
-        $gasPrice = GasPricing::where('business_id', $user->id)->first();
+        $gasPrice = GasPricing::where('business_id', $user->id)->get();
 
-        $gasPrice =  new GasPriceResource($gasPrice);
+        $gasPrice =  GasPriceResource::collection($gasPrice);
 
         return $this->sendResponse($gasPrice);
     }
@@ -28,12 +28,42 @@ class GasPricingController extends Controller
         try {
             $user = $request->user();
 
-            GasPricing::updateOrCreate(
-                ['business_id' => $user->id],
-                ['price' => $validated->price, 'kg' => 1]
-            );
+            GasPricing::create(['business_id' => $user->id, 'price' => $validated->price, 'kg' =>  $validated->cylinder_size]);
 
             return $this->sendResponse([], "Gas Pricing updated successfully", 201);
+        } catch (\Exception $e) {
+
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function update(GasPriceRequest $request, GasPricing $gasPrice)
+    {
+        $validated = (object) $request->validated();
+
+        try {
+
+            $gasPrice->update(['price' => $validated->price, 'kg' =>  $validated->cylinder_size]);
+
+            return $this->sendResponse([], "Gas Pricing updated successfully", 201);
+        } catch (\Exception $e) {
+
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function destroy(GasPricing $gasPrice)
+    {
+
+        try {
+
+            $gasPrice->delete();
+
+            return $this->sendResponse([], "Gas Pricing deleted successfully", 201);
         } catch (\Exception $e) {
 
             sendToLog($e);
