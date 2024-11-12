@@ -25,13 +25,10 @@ class UpdateBusinessDetails extends FormRequest
     public function rules(): array
     {
         return [
-            'business_name' => ['required'],
-            'date_incorporated' => ['nullable'],
-            'office_address' => ['required'],
-            'longitude' => ['nullable'],
-            'latitude' => ['nullable'],
-            'opening_hours'  => ['required'],
-            'date_incorporated' => ['nullable'],
+            'business_name' => ['nullable', 'string', 'max:255'],
+            'office_address' => ['required', 'string', 'max:255'],
+            'longitude' => ['required'],
+            'latitude' => ['required'],
         ];
     }
 

@@ -42,7 +42,8 @@ class RegisterController extends Controller
                 'phone_number'  => formatPhoneNumber($validated['phone_number']),
                 'date_of_birth' => $validated['date_of_birth'],
                 'parent_id'     => $parent,
-                'is_business'   => false
+                'is_business'   => false,
+                'account_type' => 'CUSTOMER',
             ]);
 
             $code = $this->generateUserOtp($user->id, "phone_number_verification");

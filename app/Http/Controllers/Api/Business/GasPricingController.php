@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\Business;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GasPriceRequest;
+use App\Http\Requests\PricePerKgRequest;
 use App\Http\Resources\GasPriceResource;
 use App\Models\GasPricing;
+use App\Models\PricePerKg;
 use Illuminate\Http\Request;
 
 class GasPricingController extends Controller
@@ -48,6 +50,23 @@ class GasPricingController extends Controller
             $gasPrice->update(['price' => $validated->price, 'kg' =>  $validated->cylinder_size]);
 
             return $this->sendResponse([], "Gas Pricing updated successfully", 201);
+        } catch (\Exception $e) {
+
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function setPricePerKg(PricePerKgRequest $request)
+    {
+        try {
+
+            $user = $request->user();
+
+            PricePerKg::updateOrCreate(['user_id' => $user->id, 'price' => $request->price_per_kg]);
+
+            return $this->sendResponse([], "Price per Kg set successfully", 201);
         } catch (\Exception $e) {
 
             sendToLog($e);

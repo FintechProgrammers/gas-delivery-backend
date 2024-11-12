@@ -48,6 +48,8 @@ class RegisterController extends Controller
                 'phone_number' => $validated->phone_number,
                 'password' => Hash::make($validated->password),
                 'is_business' => true,
+                'account_type' => 'BUSINESS',
+                'phone_number_verified_at' => now(),
                 'profile_image' => $photoUrl
             ]);
 

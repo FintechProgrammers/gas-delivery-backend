@@ -51,10 +51,10 @@ class User extends Authenticatable
         return !empty($this->profile_image) ? $this->profile_image : url('/') . '/assets/images/avatar.svg';
     }
 
-    public function getAccountTypeAttribute(): string
-    {
-        return $this->is_business ? "BUSINESS" : "PERSONAL";
-    }
+    // public function getAccountTypeAttribute(): string
+    // {
+    //     return $this->is_business ? "BUSINESS" : "PERSONAL";
+    // }
 
     protected static function boot()
     {
@@ -159,7 +159,12 @@ class User extends Authenticatable
 
     function pricing()
     {
-        return $this->hasOne(GasPricing::class, 'business_id', 'id')->latest();
+        return $this->hasMany(GasPricing::class, 'business_id', 'id')->latest();
+    }
+
+    function pricePerKg()
+    {
+        return $this->hasOne(PricePerKg::class, 'user_id', 'id');
     }
 
     /**

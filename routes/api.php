@@ -72,6 +72,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::controller(GasPricingController::class)->prefix('pricing')->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'store');
+            Route::post('/price-per-kg', 'setPricePerKg');
             Route::patch('/update/{gasPrice}', 'update');
             Route::delete('/delete/{gasPrice}', 'destroy');
         });
