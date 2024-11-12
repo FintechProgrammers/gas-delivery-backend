@@ -13,9 +13,7 @@ class VeryPhoneNumber extends Notification
 {
     use Queueable;
 
-    public function __construct(public $token)
-    {
-    }
+    public function __construct(public $token) {}
 
     public function via($notifiable)
     {

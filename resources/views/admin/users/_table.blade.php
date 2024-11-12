@@ -1,13 +1,12 @@
 @forelse ($users as $item)
     <tr>
         <td>
-            <x-profile-component name="{{ $item->name }}" email="{{ $item->email }}"
+            <x-profile-component name="{{ $item->full_name }}" email="{{ $item->email }}"
                 image="{{ $item->profile_picture }}" />
         </td>
-        <td>{{ $item->username }}</td>
         <td class="text-center">
-            @if ($item->is_ambassador)
-                <span class="badge bg-blue">Ambassador</span>
+            @if ($item->is_business)
+                <span class="badge bg-blue">Business</span>
             @else
                 <span class="badge bg-black">Customer</span>
             @endif
@@ -54,7 +53,7 @@
     </tr>
 @endforelse
 <tr style="border: none;">
-    <td colspan="6" style="border: none;">
+    <td colspan="5" style="border: none;">
         {{ $users->links('vendor.pagination.custom') }}
     </td>
 </tr>

@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -18,9 +19,9 @@ class LoginController extends Controller
 
             $validated = $request->validated();
 
-            $user = User::where('email', $validated['email'])->where('is_business', true)->first();
+            $user = User::where('phone_number', $validated['phone_number'])->where('is_business', true)->first();
 
-            if (!$user) {
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
                 return $this->sendError("Invalid login credentials", [], 404);
             }
 

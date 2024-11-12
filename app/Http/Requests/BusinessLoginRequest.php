@@ -25,7 +25,7 @@ class BusinessLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'  => ['email', 'required'],
+            'phone_number'  => ['required'],
             'password' => ['required']
         ];
     }

@@ -3,18 +3,19 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Contracts\Validation\Validator;
 
-class UpdateBusinessDetails extends FormRequest
+class VerifyPhoneRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -25,10 +26,8 @@ class UpdateBusinessDetails extends FormRequest
     public function rules(): array
     {
         return [
-            'business_name' => ['nullable', 'string', 'max:255'],
-            'office_address' => ['required', 'string', 'max:255'],
-            'longitude' => ['required'],
-            'latitude' => ['required'],
+            'phone_number' => ['required'],
+            'token' => ['required', 'digits:4']
         ];
     }
 

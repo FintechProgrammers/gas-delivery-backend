@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GasPriceRequest extends FormRequest
+class PricePerKgRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -22,8 +22,7 @@ class GasPriceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'price' => ['required', 'numeric'],
-            'cylinder_size' => ['sometimes', 'numeric']
+            'price_per_kg' => ['required', 'numeric']
         ];
     }
 }

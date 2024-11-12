@@ -28,9 +28,10 @@ class User extends Authenticatable
 
     // Define the required fields for the user model and the related userInfo model
     protected $userRequiredFields = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
-        'username',
+        'business_name'
     ];
 
     protected $userInfoRequiredFields = [
@@ -50,10 +51,10 @@ class User extends Authenticatable
         return !empty($this->profile_image) ? $this->profile_image : url('/') . '/assets/images/avatar.svg';
     }
 
-    public function getAccountTypeAttribute(): string
-    {
-        return $this->is_business ? "BUSINESS" : "PERSONAL";
-    }
+    // public function getAccountTypeAttribute(): string
+    // {
+    //     return $this->is_business ? "BUSINESS" : "PERSONAL";
+    // }
 
     protected static function boot()
     {
@@ -63,16 +64,16 @@ class User extends Authenticatable
             $user->referral_code = static::generateReferralCode();
         });
 
-        static::created(function ($user) {
-            if ($user->is_business) {
-                BusinessInfo::create(['user_id' => $user->id]);
-            }
-        });
+        // static::created(function ($user) {
+        //     if ($user->is_business) {
+        //         BusinessInfo::create(['user_id' => $user->id]);
+        //     }
+        // });
     }
 
-    function businessProfile()
+    function profile()
     {
-        return $this->hasOne(BusinessInfo::class, 'user_id', 'id');
+        return $this->hasOne(UserInfo::class, 'user_id', 'id');
     }
 
     public static function generateReferralCode()
@@ -139,6 +140,18 @@ class User extends Authenticatable
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
     }
 
+    /**
+     * Get the full name of the user.
+     */
+    public function getFullNameAttribute(): string
+    {
+        if ($this->is_business) {
+            return !empty($this->business_name) ? \Illuminate\Support\Str::title($this->business_name) : 'Unavailable';
+        } else {
+            return !empty($this->first_name) ? \Illuminate\Support\Str::title($this->first_name . ' ' . $this->last_name) : 'Unavailable';
+        }
+    }
+
     public function routeNotificationForWhatsApp()
     {
         return $this->phone_number;
@@ -146,7 +159,12 @@ class User extends Authenticatable
 
     function pricing()
     {
-        return $this->hasOne(GasPricing::class, 'business_id', 'id')->latest();
+        return $this->hasMany(GasPricing::class, 'business_id', 'id')->latest();
+    }
+
+    function pricePerKg()
+    {
+        return $this->hasOne(PricePerKg::class, 'user_id', 'id');
     }
 
     /**

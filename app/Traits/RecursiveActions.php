@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\PhoneVerificationCode;
 use App\Models\UserOtp;
 use Carbon\Carbon;
 
@@ -29,6 +30,23 @@ trait RecursiveActions
             [
                 'user_id' => $userId,
                 'purpose' => $purpose,
+            ],
+            [
+                'token' => $otp,
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        return $otp;
+    }
+
+    public function generatePhoneToken($phoneNumber)
+    {
+        $otp = $this->generateOtpCode();
+
+        PhoneVerificationCode::updateOrCreate(
+            [
+                'phone_number' => $phoneNumber,
             ],
             [
                 'token' => $otp,
