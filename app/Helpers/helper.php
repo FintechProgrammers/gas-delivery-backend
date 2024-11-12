@@ -283,3 +283,10 @@ if (!function_exists('formatPhoneNumber')) {
         return $phoneNumber;
     }
 }
+
+if (!function_exists('maxDistance')) {
+    function maxDistance()
+    {
+        return 30;
+    }
+}

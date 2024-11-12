@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\DeliveryAddressController;
 use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
+use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
@@ -20,6 +22,9 @@ use Symfony\Component\HttpFoundation\Response;
 Route::prefix('auth')->group(function () {
     Route::post('/register', RegisterController::class);
     Route::post('/login', LoginController::class);
+
+    Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
+    Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
 
     Route::prefix('business')->group(function () {
         Route::controller(VerifyPhoneVerificationController::class)->prefix('phone')->group(function () {
@@ -31,8 +36,15 @@ Route::prefix('auth')->group(function () {
         Route::post('/login', BusinessLoginController::class);
     });
 
-    Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
-    Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
+    Route::prefix('rider')->group(function () {
+        Route::controller(VerifyPhoneVerificationController::class)->prefix('phone')->group(function () {
+            Route::post('token/request', 'requestCode');
+            Route::post('verify', 'verifyCode');
+        });
+
+        Route::post('/register', RiderRegisterController::class);
+        Route::post('/login', RiderLoginController::class);
+    });
 });
 
 Route::middleware(['auth:api'])->group(function () {

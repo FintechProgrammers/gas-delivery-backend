@@ -28,10 +28,10 @@ class UserResource extends JsonResource
             'email_verified'       => (bool) !empty($this->email_verified_at) ? true : false,
             'status'               => $this->status,
             'is_available'         => (bool) $this->is_available,
-            'price_per_kg'         => ($this->pricePerKg)->price,
-            'opening_hours'        => ($this->profile)->opening_hours,
-            'opening_days'        => ($this->profile)->opening_days,
-            'address'               => ($this->profile)->address,
+            'price_per_kg'         => optional($this->pricePerKg)->price,
+            'opening_hours'        => optional($this->profile)->opening_hours,
+            'opening_days'        => optional($this->profile)->opening_days,
+            'address'               => optional($this->profile)->address,
         ];
     }
 }
