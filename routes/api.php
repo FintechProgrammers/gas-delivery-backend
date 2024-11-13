@@ -10,8 +10,10 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DeliveryAddressController;
 use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
+use App\Http\Controllers\Api\Rider\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
@@ -80,6 +82,13 @@ Route::middleware(['auth:api'])->group(function () {
         });
     });
 
+    Route::controller(OrderController::class)->prefix('orders')->group(function () {
+        Route::get('', 'index');
+        Route::post('', 'placeOrder');
+        Route::get('/show/{order}', 'orderDetails');
+        Route::post('/rider/request', 'requestRider');
+    });
+
     Route::prefix('business')->group(function () {
         Route::controller(GasPricingController::class)->prefix('pricing')->group(function () {
             Route::get('/', 'index');
@@ -92,6 +101,14 @@ Route::middleware(['auth:api'])->group(function () {
         Route::controller(SettingsController::class)->prefix('settings')->group(function () {
             Route::post('opening/days', 'openingDays');
             Route::post('availability', 'toggleAvailability');
+        });
+    });
+
+    Route::prefix('rider')->group(function () {
+        Route::controller(OrderRequestController::class)->prefix('orders')->group(function () {
+            Route::get('', 'index');
+            Route::post('/accept/{order}', 'acceptOrder');
+            Route::post('/reject/{order}', 'rejectOrder');
         });
     });
 

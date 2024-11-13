@@ -290,3 +290,30 @@ if (!function_exists('maxDistance')) {
         return 30;
     }
 }
+
+if (!function_exists('calculateDistance')) {
+    function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
+    {
+        $earthRadius = 6371; // Earth radius in kilometers
+
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
+    }
+}
+
+if (!function_exists('pricePerKm')) {
+    function pricePerKm()
+    {
+        return 100;
+    }
+}
