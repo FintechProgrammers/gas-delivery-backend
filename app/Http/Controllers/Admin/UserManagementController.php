@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserInfo;
 use Carbon\Carbon;
@@ -30,15 +31,13 @@ class UserManagementController extends Controller
         $status = $request->filled('status')  ? $request->status : null;
         $accountType = $request->filled('account_type') ? $request->account_type : null;
 
-        $query = User::withTrashed();
+        $query = User::where('is_business', true)->withTrashed();
 
         $query = $query
-            ->when(!empty($search), fn ($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")->orWhere('username', 'LIKE', "%{$search}%"))
-            ->when(!empty($status), fn ($query) => $query->where('status', $status))
-            ->when(!empty($accountType), fn ($query) => $accountType == 'business' ? $query->where('is_business', true) : $query->where('is_business', false))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn ($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($accountType) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $accountType == 'business' ? $query->where('is_business', true)->whereBetween('created_at', [$dateFrom, $dateTo]) : $query->where('is_business', false)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(!empty($search), fn($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")->orWhere('username', 'LIKE', "%{$search}%"))
+            ->when(!empty($status), fn($query) => $query->where('status', $status))
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
+            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['users'] = $query->paginate(50);
 
@@ -96,8 +95,29 @@ class UserManagementController extends Controller
         return view('admin.users.show', $data);
     }
 
-    function update(Request $request)
+    function update(UpdateUserRequest $request, User $user)
     {
+        try {
+            $user->update([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+            ]);
+
+            $user->userProfile->update([
+                'country_code'  => $request->country,
+                'address'       => $request->address,
+                'city'          => $request->city,
+                'state'         => $request->state,
+                'date_of_birth' => $request->date_of_birth,
+                'zip_code'      => $request->zip_code,
+            ]);
+
+            return $this->sendResponse([], "User profile updated successfully.");
+        } catch (\Exception $e) {
+            logger($e);
+
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
     }
 
     function suspend(User $user)

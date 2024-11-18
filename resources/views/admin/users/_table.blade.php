@@ -4,13 +4,6 @@
             <x-profile-component name="{{ $item->full_name }}" email="{{ $item->email }}"
                 image="{{ $item->profile_picture }}" />
         </td>
-        <td class="text-center">
-            @if ($item->is_business)
-                <span class="badge bg-blue">Business</span>
-            @else
-                <span class="badge bg-black">Customer</span>
-            @endif
-        </td>
         <td>{{ $item->created_at->format('jS, M Y H:i A') }}</td>
         <td>
             @if ($item->status === 'active')
@@ -20,9 +13,8 @@
             @endif
         </td>
         <td>
-            <a aria-label="anchor" href="javascript:void(0);" class="" data-bs-toggle="dropdown"
-                aria-expanded="false">
-                <i class="bi bi-three-dots fs-22"></i>
+            <a aria-label="anchor" href="javascript:void(0);" class="" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="las la-ellipsis-v fs-20 text-muted"></i>
             </a>
             <ul class="dropdown-menu" style="">
                 <li class="mb-0">

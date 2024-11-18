@@ -1,54 +1,55 @@
 @extends('layouts.auth')
 
 @section('content')
-    <p class="h5 fw-semibold mb-2 text-center">{{ __('Administrative Sign In') }}</p>
     <form action="{{ route('admin.login.post') }}" method="POST" id="loginForm">
         @csrf
-        <div class="row gy-3">
-            <div class="col-xl-12 mb-3">
-                <label for="signin-username" class="form-label text-default">Email</label>
-                <input type="text" class="form-control form-control-lg" name="email" id="signin-username"
-                    placeholder="Email Address">
-                @error('email')
-                    <div class="text-danger">
-                        {{ $message }}
-                    </div>
-                @enderror
-            </div>
-            <div class="col-xl-12 mb-3">
-                <label for="signin-password" class="form-label text-default d-block">Password
-                    <a href="{{ route('admin.forgot.password.index') }}"
-                        class="float-end text-danger">{{ __('Forgot your password?') }}</a>
-                </label>
-                <div class="input-group">
-                    <input type="password" name="password" class="form-control form-control-lg" id="signin-password"
-                        placeholder="password">
-                    <button class="btn btn-light" type="button" onclick="createpassword('signin-password',this)"
-                        id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
+
+        <div class="form-group mb-2">
+            <label for="signin-username" class="form-label text-default">Email</label>
+            <input type="text" class="form-control" name="email" id="signin-username" placeholder="Email Address">
+            @error('email')
+                <div class="text-danger">
+                    {{ $message }}
                 </div>
-                <div class="mt-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                        <label class="form-check-label text-muted fw-normal" for="defaultCheck1">
-                            {{ __('Remember me') }}
-                        </label>
-                    </div>
-                </div>
-                @error('password')
-                    <div class="text-danger">
-                        {{ $message }}
-                    </div>
-                @enderror
+            @enderror
+        </div>
+        <div class="form-group mb-2">
+            <label for="signin-password" class="form-label text-default d-block">Password
+                <a href="{{ route('admin.forgot.password.index') }}"
+                    class="float-end text-danger">{{ __('Forgot your password?') }}</a>
+            </label>
+            <div class="input-group">
+                <input type="password" name="password" class="form-control" id="signin-password" placeholder="password">
+                <button class="btn btn-light" type="button" onclick="createpassword('signin-password',this)"
+                    id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
             </div>
-            <div class="col-xl-12 d-grid mt-2">
-                <button class="btn btn-lg btn-primary" type="submit">
-                    <div class="spinner-border" style="display: none" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    <span id="text">{{ __('Log in') }}</span>
-                </button>
+            <div class="mt-1">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+                    <label class="form-check-label text-muted fw-normal" for="defaultCheck1">
+                        {{ __('Remember me') }}
+                    </label>
+                </div>
+            </div>
+            @error('password')
+                <div class="text-danger">
+                    {{ $message }}
+                </div>
+            @enderror
+        </div>
+        <div class="form-group mb-0 row">
+            <div class="col-12">
+                <div class="d-grid mt-3">
+                    <button class="btn btn-primary" type="submit">
+                        <div class="spinner-border" style="display: none" role="status">
+                            <span class="sr-only"></span>
+                        </div>
+                        <span id="text">{{ __('Log in') }}</span>
+                    </button>
+                </div>
             </div>
         </div>
+
     </form>
 @endsection
 @push('scripts')

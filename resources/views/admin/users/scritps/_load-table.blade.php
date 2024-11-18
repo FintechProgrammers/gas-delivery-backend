@@ -21,7 +21,6 @@
         e.preventDefault();
 
         $('#search').val('')
-        $('#account_type').val('')
         $('#status').val('')
         $("#search-date").val('');
 
@@ -36,7 +35,6 @@
         const table = $('#table-body')
 
         const search = $('#search').val()
-        const account_type = $('#account_type').val()
         const status = $('#status').val()
         const date = $("#search-date").val();
         const [startDate, endDate] = date.split(" - ");
@@ -47,7 +45,6 @@
             type: 'GET',
             data: {
                 search: search,
-                account_type: account_type,
                 status: status,
                 startDate: startDate,
                 endDate: endDate,

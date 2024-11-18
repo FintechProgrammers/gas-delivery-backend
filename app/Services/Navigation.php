@@ -12,37 +12,43 @@ class Navigation
             (object) [
                 'name'  => 'Dashboard',
                 'route' => 'admin.dashboard.index',
-                'icon'  => 'bx bx-home',
+                'icon'  => 'iconoir-home-simple',
                 'hasPermission' => true
             ],
             (object) [
-                'name'      => 'Users',
-                'icon'      => 'fe fe-users',
-                'routes'    => ['admin.users.index'],
-                'hasPermission' => true,
-                'subMenu'   => (object) [
-                    (object) [
-                        'name'  => 'Administrators',
-                        'route' => 'admin.admins.index',
-                        'hasPermission' => true
-                    ],
-                    (object) [
-                        'name'  => 'All Users',
-                        'route' => 'admin.users.index',
-                        'hasPermission' => true
-                    ],
-                ]
+                'name'  => 'Customers',
+                'route' => 'admin.customer.index',
+                'icon'  => 'iconoir-user-cart',
+                'hasPermission' => true
+            ],
+            (object) [
+                'name'  => 'Riders',
+                'route' => 'admin.rider.index',
+                'icon'  => 'iconoir-cycling',
+                'hasPermission' => true
+            ],
+            (object) [
+                'name'  => 'Vendors',
+                'route' => 'admin.users.index',
+                'icon'  => 'iconoir-user-bag',
+                'hasPermission' => true
+            ],
+            (object) [
+                'name'  => 'Administrators',
+                'route' => 'admin.admins.index',
+                'icon'  => 'iconoir-home-simple',
+                'hasPermission' => true
             ],
             (object) [
                 'name'  => 'Orders',
                 'route' => 'admin.order.index',
-                'icon'  => 'bx bx-cart-alt',
+                'icon'  => 'iconoir-cart-alt',
                 'hasPermission' => true
             ],
             (object) [
-                'name'  => 'Deliveries',
-                'route' => 'admin.delivery.index',
-                'icon'  => 'bx bx-cycling',
+                'name'  => 'Transactions',
+                'route' => 'admin.transactions.index',
+                'icon'  => 'iconoir-coins',
                 'hasPermission' => true
             ],
             (object) [
@@ -67,6 +73,12 @@ class Navigation
                 'name'  => 'Role Management',
                 'route' => 'admin.roles.index',
                 'icon'  => 'las la-bezier-curve',
+                'hasPermission' => true
+            ],
+            (object) [
+                'name'  => 'Settings',
+                'route' => 'admin.roles.index',
+                'icon'  => 'iconoir-tools',
                 'hasPermission' => true
             ],
         ];

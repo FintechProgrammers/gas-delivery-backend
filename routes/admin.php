@@ -5,13 +5,16 @@ use App\Http\Controllers\Admin\Auth\AdminForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\AdminResetPasswordController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RiderController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SupportController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,6 +47,17 @@ Route::middleware('admin.auth')->group(function () {
         Route::post('/suspend/{user}', 'suspend')->name('suspend');
         Route::post('/activate/{user}', 'activate')->name('activate');
         Route::post('/delete/{user}', 'destroy')->name('delete');
+    });
+
+
+    Route::controller(CustomerController::class)->prefix('customer')->name('customer.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
+    });
+
+    Route::controller(RiderController::class)->prefix('rider')->name('rider.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
     });
 
     Route::controller(AdministrativeUserController::class)->prefix('admins')->name('admins.')->group(function () {
@@ -116,12 +130,18 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::controller(DeliveryController::class)->prefix('delivery')->name('delivery.')->group(function () {
         Route::get('index', 'index')->name('index');
-        Route::get('filter', 'filter')->name('filter');
     });
 
     Route::controller(OrderController::class)->prefix('order')->name('order.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/filter', 'filter')->name('filter');
+        Route::get('/show/{order}', 'show')->name('show');
+    });
+
+    Route::controller(TransactionController::class)->prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+        Route::get('show/{order}', 'show')->name('show');
     });
 
     Route::get('update-countries', [CountryController::class, 'updateCountriesTableWithFlags']);

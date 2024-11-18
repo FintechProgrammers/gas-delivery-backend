@@ -11,7 +11,7 @@
             <p class="fw-semibold fs-18 mb-0">Orders</p>
         </div>
     </div>
-    <div class="card custom-card">
+    <div class="card">
         <div class="p-3">
             <div class="row align-items-end ">
                 <div class="col-lg-3 mb-lg-0 mb-3">
@@ -44,11 +44,23 @@
                 </div>
             </div>
         </div>
-        <div class="card-body p-0">
+        <div class="card-body pt-0">
             <div class="table-responsive">
-                <table class="table card-table table-vcenter text-nowrap mb-0">
-                    <tbody class="active-tab" id="table-body">
-
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Customer</th>
+                            <th>Vendor</th>
+                            <th>Rider</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
                     </tbody>
                 </table>
             </div>
