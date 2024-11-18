@@ -169,6 +169,28 @@ class User extends Authenticatable
         return $this->hasOne(PricePerKg::class, 'user_id', 'id');
     }
 
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'user_id');
+    }
+
+    public function givenRatings()
+    {
+        return $this->hasMany(Rating::class, 'rated_by');
+    }
+
+    // Accessor for 5-star rating percentage
+    public function getStarRatingAttribute()
+    {
+        $totalRatings = $this->ratings()->count();
+        if ($totalRatings === 0) {
+            return 0; // Avoid division by zero
+        }
+
+        $fiveStarRatings = $this->five_star_rating_count;
+        return round(($fiveStarRatings / $totalRatings) * 100, 2);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

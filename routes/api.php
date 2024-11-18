@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\DeliveryAddressController;
 use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
 use App\Http\Controllers\Api\Rider\OrderRequestController;
@@ -120,6 +121,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('reset/token', 'requestResetToken');
         Route::post('reset', 'resetTransactionPin');
     });
+
+    Route::post('/riders/rate/{userId}', [RatingController::class, 'store']);
+    Route::get('/riders//ratings/{userId}', [RatingController::class, 'show']);
 
     Route::controller(AccountVerificationController::class)->prefix('account')->group(function () {
         Route::post('/email/verify', 'verifyEmail');

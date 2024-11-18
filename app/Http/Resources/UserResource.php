@@ -32,6 +32,9 @@ class UserResource extends JsonResource
             'opening_hours'        => optional($this->profile)->opening_hours,
             'opening_days'        => optional($this->profile)->opening_days,
             'address'               => optional($this->profile)->address,
+            'vehicle_details' => optional($this->profile)->vehical_details,
+            'rating' => $this->ratings,
+            'start_rating' => $this->start_rating,
         ];
     }
 }

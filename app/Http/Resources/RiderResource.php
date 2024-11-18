@@ -14,6 +14,21 @@ class RiderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->uuid,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'account_type' => $this->account_type,
+            'referral_code' => $this->referral_code,
+            'date_of_birth' => $this->date_of_birth,
+            'phone_number' => $this->phone_number,
+            'profile_image' => $this->profile_picture,
+            'phone_number_verified' => (bool) !empty($this->phone_number_verified_at) ? true : false,
+            'email_verified'       => (bool) !empty($this->email_verified_at) ? true : false,
+            'status'               => $this->status,
+            'is_available'         => (bool) $this->is_available,
+            'vehicle_details' => optional($this->profile)->vehical_details
+        ];
     }
 }
