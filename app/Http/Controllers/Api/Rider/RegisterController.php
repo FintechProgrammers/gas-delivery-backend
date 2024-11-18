@@ -39,12 +39,18 @@ class RegisterController extends Controller
 
             $driver_license = null;
 
+            $driver_license_back = null;
+
             if ($request->hasFile('vehicle_image')) {
                 $vehicle_image = uploadFile($request->file('vehicle_image'), 'uploads/vehicle', 'do_spaces');
             }
 
             if ($request->hasFile('driver_license')) {
                 $driver_license = uploadFile($request->file('driver_license'), 'uploads/license', 'do_spaces');
+            }
+
+            if ($request->hasFile('driver_license_back')) {
+                $driver_license_back = uploadFile($request->file('driver_license_back'), 'uploads/license', 'do_spaces');
             }
 
             $user = User::create([
@@ -68,7 +74,8 @@ class RegisterController extends Controller
                 'user_id' => $user->id,
                 'address' => $request->address,
                 'driver_license' => $driver_license,
-                'vehical_details' => json_encode($vehicalInformation)
+                'driver_license_back' => $driver_license_back,
+                'vehical_details' => json_encode($vehicalInformation),
             ]);
 
             $token = $user->createToken('auth_token')->accessToken;
