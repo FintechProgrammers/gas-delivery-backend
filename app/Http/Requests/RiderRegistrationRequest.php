@@ -26,17 +26,22 @@ class RiderRegistrationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'    => ['required', 'string'],
-            'last_name'     => ['required', 'string'],
-            'email'         => ['required', 'string', 'email', 'unique:users,email'],
-            'phone_number'  => ['required', 'numeric', 'unique:users,phone_number'],
-            'token' => ['required', 'digits:4'],
-            'password' => [
+            'first_name'    => ['required', 'string', 'max:255'],
+            'last_name'     => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone_number'  => ['required', 'numeric', 'digits_between:10,15', 'unique:users,phone_number'],
+            'token'         => ['required', 'digits:4'], // Assuming a 4-digit token is required
+            'password'      => [
                 'required',
                 'string',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
-                'confirmed', // for password confirmation
+                'confirmed', // Ensures password confirmation matches
             ],
+            'vehicle_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Optional image with constraints
+            'vehicle_colour' => ['nullable', 'string', 'max:100'], // Optional field with a max length
+            'vehicle_number' => ['nullable', 'string', 'max:50'], // Optional field with max length
+            'address'       => ['nuulable', 'string', 'max:255'], // Required address with max length
+            'driver_license' => ['nullable', 'image', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ];
     }
 

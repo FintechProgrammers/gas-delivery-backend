@@ -64,11 +64,13 @@ class User extends Authenticatable
             $user->referral_code = static::generateReferralCode();
         });
 
-        // static::created(function ($user) {
-        //     if ($user->is_business) {
-        //         BusinessInfo::create(['user_id' => $user->id]);
-        //     }
-        // });
+        static::created(function ($user) {
+            if ($user->is_business) {
+                BusinessInfo::create(['user_id' => $user->id]);
+            }
+
+            Wallet::create(['user_id' => $user->id]);
+        });
     }
 
     function profile()

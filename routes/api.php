@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
 use App\Http\Controllers\Api\Rider\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
+use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
@@ -69,6 +70,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::patch('', 'update');
         Route::patch('/update/photo', 'updateProfilePhoto');
         Route::patch('/business/update', 'updateBusinessProfile');
+        Route::post('/password/update', 'updatePassword');
     });
 
     Route::prefix('gas')->group(function () {
@@ -110,6 +112,13 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('/accept/{order}', 'acceptOrder');
             Route::post('/reject/{order}', 'rejectOrder');
         });
+    });
+
+    Route::controller(TransactionPinController::class)->prefix('transaction/pin')->group(function () {
+        Route::post('set', 'setTransactionPin');
+        Route::post('update', 'updateTransactionPin');
+        Route::post('reset/token', 'requestResetToken');
+        Route::post('reset', 'resetTransactionPin');
     });
 
     Route::controller(AccountVerificationController::class)->prefix('account')->group(function () {

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateBusinessDetails;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
@@ -101,6 +103,28 @@ class ProfileController extends Controller
             sendToLog($e);
 
             return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function updatePassword(UpdatePasswordRequest $request)
+    {
+        try {
+            $user = $request->user();
+
+            // check if current password is valid
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json(['success' => false, 'message' => 'Invalid current password'], 401);
+            }
+
+            $user->update([
+                'password'  => Hash::make($request->password)
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Password updated successfully']);
+        } catch (\Exception $e) {
+            logger($e);
+
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
         }
     }
 }
