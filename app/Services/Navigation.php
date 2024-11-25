@@ -77,7 +77,7 @@ class Navigation
             ],
             (object) [
                 'name'  => 'Settings',
-                'route' => 'admin.roles.index',
+                'route' => 'admin.settings.index',
                 'icon'  => 'iconoir-tools',
                 'hasPermission' => true
             ],

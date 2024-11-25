@@ -248,7 +248,7 @@
                                 class="las la-user fs-18 me-1 align-text-bottom"></i> Profile</a>
 
                         <div class="dropdown-divider mb-0"></div>
-                        <a class="dropdown-item text-danger" href="{{ route('logout') }}"><i
+                        <a class="dropdown-item text-danger" href="{{ route('admin.profile.logout') }}"><i
                                 class="las la-power-off fs-18 me-1 align-text-bottom"></i> Logout</a>
                     </div>
                 </li>

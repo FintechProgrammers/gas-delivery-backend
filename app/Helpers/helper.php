@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Settings;
+use App\Models\Setting;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -259,7 +259,7 @@ if (!function_exists('limitWords')) {
 if (!function_exists('systemSettings')) {
     function systemSettings()
     {
-        return Settings::first();
+        return Setting::first();
     }
 }
 

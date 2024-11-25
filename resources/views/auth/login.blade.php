@@ -23,7 +23,8 @@
                 </label>
                 @endif
                 <div class="input-group">
-                    <input type="password" class="form-control form-control-lg" name="password" id="signin-password" placeholder="password">
+                    <input type="password" class="form-control form-control-lg" name="password" id="signin-password"
+                        placeholder="password">
                     <button class="btn btn-light" type="button" onclick="createpassword('signin-password',this)"
                         id="button-addon2"><i class="ri-eye-off-line align-middle"></i></button>
                 </div>
@@ -52,7 +53,8 @@
         </div>
     </form>
     <div class="text-center">
-        <p class="fs-12 text-muted mt-3">Dont have an account?  <a href="{{ route('register') }}" class="text-primary">{{ __('Sign Up') }}</a></p>
+        <p class="fs-12 text-muted mt-3">Dont have an account? <a href="{{ route('register') }}"
+                class="text-primary">{{ __('Sign Up') }}</a></p>
     </div>
 @endsection
 @push('scripts')

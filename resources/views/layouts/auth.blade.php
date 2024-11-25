@@ -26,14 +26,12 @@
                     <div class="row">
                         <div class="col-lg-4 mx-auto">
                             <div class="card">
-                                <div class="card-body p-0 bg-black auth-header-box rounded-top">
-                                    <div class="text-center p-3">
+                                <div class="card-body p-0  auth-header-box rounded-top">
+                                    <div class="text-center">
                                         <a href="#" class="logo logo-admin">
-                                            <img src="{{ asset('assets/images/logo-sm.png') }}" height="50"
-                                                alt="logo" class="auth-logo">
+                                            <img src="{{ asset('assets/images/logo-4.PNG') }}" height="200"
+                                                width="300" alt="logo" class="auth-logo">
                                         </a>
-                                        <h4 class="mt-3 mb-1 fw-semibold text-white fs-18">Let's Get Started</h4>
-                                        <p class="text-muted fw-medium mb-0">Sign in to continue</p>
                                     </div>
                                 </div>
                                 <div class="card-body pt-0">

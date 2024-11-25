@@ -2,12 +2,14 @@
     <!--start brand-->
     <div class="brand">
         <a href="#" class="logo">
-            <span>
-                <img src="{{ asset('assets/images/logo-sm.png') }}" alt="logo-small" class="logo-sm">
-            </span>
+            {{-- <span>
+                <img src="{{ asset('assets/images/logo-2.PNG') }}" alt="logo-small" class="logo-sm">
+            </span> --}}
             <span class="">
-                <img src="{{ asset('assets/images/logo-light.png') }}" alt="logo-large" class="logo-lg logo-light">
-                <img src="{{ asset('assets/images/logo-dark.png') }}" alt="logo-large" class="logo-lg logo-dark">
+                <img src="{{ asset('assets/images/logo-3.PNG') }}" alt="logo-large" class="logo-lg logo-light"
+                    width="150">
+                <img src="{{ asset('assets/images/logo-3.PNG') }}" alt="logo-large" class="logo-lg logo-dark"
+                    width="150">
             </span>
         </a>
     </div>
