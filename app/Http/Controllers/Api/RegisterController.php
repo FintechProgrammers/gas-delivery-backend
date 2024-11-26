@@ -10,6 +10,7 @@ use App\Notifications\VeryPhoneNumber;
 use App\Traits\RecursiveActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Twilio\Rest\Client;
 
 class RegisterController extends Controller
@@ -39,8 +40,9 @@ class RegisterController extends Controller
                 'first_name'    => $validated['first_name'],
                 'last_name'     => $validated['last_name'],
                 'email'         => $validated['email'],
+                'password' => Hash::make($validated['password']),
                 'phone_number'  => formatPhoneNumber($validated['phone_number']),
-                'date_of_birth' => $validated['date_of_birth'],
+                'date_of_birth' => ($request->filled('date_of_birth')) ? $validated['date_of_birth'] : null,
                 'parent_id'     => $parent,
                 'is_business'   => false,
                 'account_type' => 'CUSTOMER',
