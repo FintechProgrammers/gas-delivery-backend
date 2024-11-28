@@ -22,6 +22,15 @@ class RegisterController extends Controller
     {
         $validated = (object) $request->validated();
 
+        if (User::where('email', $validated->email)->exists()) {
+            return $this->sendError("Email address already taken", [], 422);
+        }
+
+        if (User::where('phone_number', $validated->phone_number)->exists()) {
+            return $this->sendError("Email address already taken", [], 422);
+        }
+
+
         try {
             DB::beginTransaction();
 

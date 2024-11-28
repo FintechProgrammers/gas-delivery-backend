@@ -28,8 +28,8 @@ class RiderRegistrationRequest extends FormRequest
         return [
             'first_name'    => ['required', 'string', 'max:255'],
             'last_name'     => ['required', 'string', 'max:255'],
-            'email'         => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'phone_number'  => ['required', 'numeric', 'digits_between:10,15', 'unique:users,phone_number'],
+            'email'         => ['required', 'string', 'email', 'max:255'],
+            'phone_number'  => ['required', 'numeric', 'digits_between:10,15'],
             'token'         => ['required', 'digits:4'], // Assuming a 4-digit token is required
             'password'      => [
                 'required',

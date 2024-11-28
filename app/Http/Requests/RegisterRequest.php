@@ -28,8 +28,8 @@ class RegisterRequest extends FormRequest
         return [
             'first_name'    => ['required', 'string'],
             'last_name'     => ['required', 'string'],
-            'email'         => ['required', 'string', 'email', 'unique:users,email'],
-            'phone_number'  => ['required', 'numeric', 'unique:users,phone_number'],
+            'email'         => ['required', 'string', 'email'],
+            'phone_number'  => ['required', 'numeric'],
             'date_of_birth'  => ['nullable', 'date_format:Y-m-d'],
             'referral_code' => ['nullable', 'exists:users,referral_code'],
             'password'      => [

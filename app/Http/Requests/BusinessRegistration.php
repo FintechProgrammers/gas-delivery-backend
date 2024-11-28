@@ -26,8 +26,8 @@ class BusinessRegistration extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['email', 'required', 'unique:users,email'],
-            'phone_number' => ['required', 'unique:users,phone_number'],
+            'email' => ['email', 'required'],
+            'phone_number' => ['required'],
             'business_name' => ['string', 'required'],
             'token' => ['required', 'digits:4'],
             'photo' => ['image', 'mimes:jpeg,png,jpg,gif|max:2048'],
