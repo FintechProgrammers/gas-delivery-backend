@@ -14,7 +14,7 @@ class DeliveryAddressController extends Controller
     {
         $user = $request->user();
 
-        $address = DeliveryAddressResource::collection(DeliveryAddress::where('user_id', $user->id)->latest()->get());
+        $address = new DeliveryAddressResource(DeliveryAddress::where('user_id', $user->id)->first());
 
         return $this->sendResponse($address);
     }

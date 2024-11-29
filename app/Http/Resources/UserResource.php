@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\DeliveryAddress;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,7 +35,7 @@ class UserResource extends JsonResource
             'vehicle_details' => optional($this->profile)->vehical_details,
             'rating' => $this->ratings,
             'start_rating' => $this->start_rating,
-            'delivery_address' => new DeliveryAddress($this->deliveryAddress)
+            'delivery_address' => new DeliveryAddressResource($this->deliveryAddress)
         ];
     }
 }
