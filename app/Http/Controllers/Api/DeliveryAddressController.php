@@ -27,12 +27,8 @@ class DeliveryAddressController extends Controller
 
             $address = DeliveryAddress::create([
                 'user_id' => $user->id,
-                'country_id' => $request->country,
-                'state' => $request->state,
-                'city' => $request->city,
-                'house_number' => $request->house_number,
-                'street' => $request->street,
-                'nearest_land_mark' => $request->nearest_land_mark
+                'longitude' => $request->longitude,
+                'latitude' => $request->latitude,
             ]);
 
             $address = new DeliveryAddressResource($address);

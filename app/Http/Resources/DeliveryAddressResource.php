@@ -16,12 +16,9 @@ class DeliveryAddressResource extends JsonResource
     {
         return [
             'id'  => $this->uuid,
-            'country' => new CountryResource($this->country),
-            'state' => $this->state,
-            'city' => $this->city,
-            'house_number'  => $this->house_number,
-            'street' => $this->street,
-            'land_mark' => $this->nearest_land_mark,
+            'longitude' => $this->longitude,
+            'latitude' => $this->latitude,
+            'address' => $this->address,
             'created_at' => $this->created_at,
         ];
     }

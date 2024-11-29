@@ -35,6 +35,11 @@ class GasOrder extends Model
         return $this->belongsTo(User::class, 'rider_id', 'id');
     }
 
+    function deliveryAddress()
+    {
+        return $this->hasOne(DeliveryAddress::class, 'delivery_address_id', 'id');
+    }
+
     /**
      * Define the route model binding key for a given model.
      */

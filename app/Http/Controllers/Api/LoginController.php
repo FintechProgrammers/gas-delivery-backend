@@ -9,7 +9,9 @@ use App\Models\User;
 use App\Notifications\AuthToken;
 use App\Traits\RecursiveActions;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -24,7 +26,7 @@ class LoginController extends Controller
 
             $user = User::where('phone_number', formatPhoneNumber($validated['phone_number']))->where('is_business', false)->first();
 
-            if (!$user) {
+            if (!$user || !Hash::check($validated['password'], $user->password)) {
                 return $this->sendError("Invalid login credentials", [], 404);
             }
 
@@ -33,9 +35,9 @@ class LoginController extends Controller
                 return $this->sendError("Your account has been restricted. Please contact our support team for assistance.", [], 401);
             }
 
-            $code = $this->generateUserOtp($user->id, "auth_otp");
+            // $code = $this->generateUserOtp($user->id, "auth_otp");
 
-            $user->notify(new AuthToken($code));
+            // $user->notify(new AuthToken($code));
 
             $token = $user->createToken('auth_token')->accessToken;
 

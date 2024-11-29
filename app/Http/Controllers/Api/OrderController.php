@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
 use App\Http\Requests\RequestRider;
 use App\Http\Resources\OrderResource;
+use App\Models\DeliveryAddress;
 use App\Models\GasPricing;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
@@ -37,6 +38,17 @@ class OrderController extends Controller
 
             $gasPrice = GasPricing::whereUuid($request->product)->first();
 
+            if (!$gasPrice) {
+                return $this->sendError("Invalid gas price", [], 404);
+            }
+
+            // get user delivery information
+            $deliveryAddress = DeliveryAddress::whereUuid($request->delivery_address)->first();
+
+            if (!$deliveryAddress) {
+                return $this->sendError("Invalid delivery address", [], 404);
+            }
+
             $business = $gasPrice->business;
 
             $stationAddress = [
@@ -45,8 +57,8 @@ class OrderController extends Controller
             ];
 
             $userAddress = [
-                'longitude' => $request->longitude,
-                'latitude' => $request->latitude
+                'longitude' => $deliveryAddress->longitude,
+                'latitude' => $deliveryAddress->latitude
             ];
 
             $distance = calculateDistance(
@@ -69,6 +81,7 @@ class OrderController extends Controller
             GasOrder::create([
                 'reference' => generateReference(),
                 'user_id' => $user->id,
+                'delivery_address_id' => $deliveryAddress->id,
                 'business_id' => $gasPrice->business_id,
                 'to_distination' => json_encode($stationAddress),
                 'from_distination' => json_encode($userAddress),

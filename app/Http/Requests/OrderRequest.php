@@ -23,8 +23,7 @@ class OrderRequest extends FormRequest
     {
         return [
             'product' => ['required', 'exists:gas_pricings,uuid'],
-            'latitude' => ['required'],
-            'longitude' => ['required'],
+            'delivery_address' => ['required'],
         ];
     }
 }
