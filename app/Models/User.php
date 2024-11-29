@@ -138,6 +138,11 @@ class User extends Authenticatable
         return $this->hasMany(UserActivities::class, 'user_id', 'id')->latest();
     }
 
+    function deliveryAddress()
+    {
+        return $this->hasOne(DeliveryAddress::class, 'user_id', 'id');
+    }
+
     function bankAccounts()
     {
         return $this->hasMany(BankAccount::class, 'user_id')->latest();

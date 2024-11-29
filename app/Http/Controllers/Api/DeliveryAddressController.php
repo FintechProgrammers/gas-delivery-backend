@@ -25,15 +25,16 @@ class DeliveryAddressController extends Controller
 
             $user = $request->user();
 
-            $address = DeliveryAddress::create([
-                'user_id' => $user->id,
-                'longitude' => $request->longitude,
-                'latitude' => $request->latitude,
-            ]);
+            DeliveryAddress::updateOrCreate(
+                ['user_id' => $user->id], // Matching condition
+                [
+                    'address' => $request->address,
+                    'longitude' => $request->longitude,
+                    'latitude' => $request->latitude,
+                ]
+            );
 
-            $address = new DeliveryAddressResource($address);
-
-            return $this->sendResponse($address, "Delivery Address created successfully", 201);
+            return $this->sendResponse([], "Delivery Address created successfully", 201);
         } catch (\Exception $e) {
 
             sendToLog($e);
