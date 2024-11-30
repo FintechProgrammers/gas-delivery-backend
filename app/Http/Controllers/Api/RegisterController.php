@@ -20,14 +20,15 @@ class RegisterController extends Controller
     function __invoke(RegisterRequest $request)
     {
         try {
+
             $validated = $request->validated();
 
             // check if user is already registered with same email and phone numbet
-            if (User::where('email', $validated->email)->exists()) {
+            if (User::where('email', $validated['email'])->exists()) {
                 return $this->sendError("Email address already taken", [], 422);
             }
 
-            if (User::where('phone_number', $validated->phone_number)->exists()) {
+            if (User::where('phone_number', $validated['phone_number'])->exists()) {
                 return $this->sendError("Email address already taken", [], 422);
             }
 
