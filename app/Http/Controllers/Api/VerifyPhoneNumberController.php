@@ -39,6 +39,7 @@ class VerifyPhoneNumberController extends Controller
     function verifyPhoneNumber(VerifyAccountRequest $request)
     {
         try {
+            DB::beginTransaction();
 
             $validated = (object) $request->validated();
 
@@ -62,6 +63,8 @@ class VerifyPhoneNumberController extends Controller
             $user->update(['phone_number_verified_at' => now()]);
 
             $token->delete();
+
+            DB::commit();
 
             return $this->sendResponse(null, "Verified successfully.");
         } catch (\Exception $e) {
