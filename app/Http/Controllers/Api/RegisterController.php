@@ -29,7 +29,7 @@ class RegisterController extends Controller
             }
 
             if (User::where('phone_number', $validated['phone_number'])->exists()) {
-                return $this->sendError("Email address already taken", [], 422);
+                return $this->sendError("Phone number address already taken", [], 422);
             }
 
             DB::beginTransaction();

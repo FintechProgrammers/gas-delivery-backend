@@ -55,7 +55,7 @@ class VerifyPhoneNumberController extends Controller
                 return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
             }
 
-            if ($user->phone_number_verified_at) {
+            if (!empty($user->phone_number_verified_at)) {
                 return $this->sendError('Your phone number is already verified', Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
