@@ -16,9 +16,9 @@ class GasPricingController extends Controller
     {
         $user = $request->user();
 
-        $gasPrice = GasPricing::where('business_id', $user->id)->get();
+        $gasPrice = GasPricing::where('user_id', $user->id)->first();
 
-        $gasPrice =  GasPriceResource::collection($gasPrice);
+        $gasPrice = new  GasPriceResource($gasPrice);
 
         return $this->sendResponse($gasPrice);
     }

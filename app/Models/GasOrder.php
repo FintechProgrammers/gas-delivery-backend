@@ -37,7 +37,7 @@ class GasOrder extends Model
 
     function deliveryAddress()
     {
-        return $this->hasOne(DeliveryAddress::class, 'delivery_address_id', 'id');
+        return $this->hasOne(DeliveryAddress::class, 'id', 'delivery_address_id');
     }
 
     /**

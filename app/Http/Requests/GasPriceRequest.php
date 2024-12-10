@@ -23,7 +23,7 @@ class GasPriceRequest extends FormRequest
     {
         return [
             'price' => ['required', 'numeric'],
-            'cylinder_size' => ['sometimes', 'numeric']
+            // 'cylinder_size' => ['sometimes', 'numeric']
         ];
     }
 }

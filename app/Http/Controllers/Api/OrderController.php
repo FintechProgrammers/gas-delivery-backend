@@ -36,10 +36,11 @@ class OrderController extends Controller
 
             $user = $request->user();
 
-            $gasPrice = GasPricing::whereUuid($request->product)->first();
+            // get vendor
+            $business = User::with('profile')->whereUuid($request->vendor)->first();
 
-            if (!$gasPrice) {
-                return $this->sendError("Invalid gas price", [], 404);
+            if (!$business) {
+                return $this->sendError("Invalid vendor selected", [], 404);
             }
 
             // get user delivery information
@@ -48,8 +49,6 @@ class OrderController extends Controller
             if (!$deliveryAddress) {
                 return $this->sendError("Invalid delivery address", [], 404);
             }
-
-            $business = $gasPrice->business;
 
             $stationAddress = [
                 'longitude' => $business->profile->longitude,
@@ -74,7 +73,9 @@ class OrderController extends Controller
 
             $deliveryFee = $distance * $pricePerKm;
 
-            $gasAmount = $gasPrice->price;
+            $pricePerKg = $business->pricePerKg->price;
+
+            $gasAmount =  $pricePerKg * $request->gas_amount;
 
             $totalAmount = $gasAmount + $deliveryFee;
 
@@ -82,14 +83,16 @@ class OrderController extends Controller
                 'reference' => generateReference(),
                 'user_id' => $user->id,
                 'delivery_address_id' => $deliveryAddress->id,
-                'business_id' => $gasPrice->business_id,
+                'business_id' => $business->id,
                 'to_distination' => json_encode($stationAddress),
                 'from_distination' => json_encode($userAddress),
                 'distance' => $distance,
                 'delivery_fee' => $deliveryFee,
                 'total_amount' => $totalAmount,
-                'gas_amount' => $gasAmount,
-                'gas_size' => $gasPrice->kg . 'kg'
+                'gas_amount' => $gasAmount, //how much gas to fill
+                'gas_size' => $request->gas_amount . 'kg', // how many kg of gas to fill
+                'cylinder_size' => $request->cylinder_size . 'kg', // cylinder size of customer
+                'price_per_km' => $pricePerKm, // price per km of customer
             ]);
 
             DB::commit();
