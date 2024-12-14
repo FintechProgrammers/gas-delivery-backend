@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Notifications\Notifiable;
 
 class PhoneNumberTokenJob implements ShouldQueue
 {
@@ -26,16 +27,24 @@ class PhoneNumberTokenJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $notifiable = new class {
-            public $phone;
-            public function routeNotificationForWhatsApp()
-            {
-                return $this->phone;
-            }
-        };
+        try {
+            $notifiable = new class {
+                use Notifiable;
 
-        $notifiable->phone = $this->phoneNumber;
+                public $phone;
 
-        $notifiable->notify(new VeryPhoneNumber($this->token));
+                public function routeNotificationForWhatsApp()
+                {
+                    return $this->phone;
+                }
+            };
+
+            $notifiable->phone = $this->phoneNumber;
+
+            // Send the notification
+            $notifiable->notify(new VeryPhoneNumber($this->token));
+        } catch (\Exception $e) {
+            logger($e);
+        }
     }
 }
