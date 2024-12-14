@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Jobs\PhoneNumberTokenJob;
 use App\Models\PhoneVerificationCode;
+use App\Models\User;
 use App\Traits\RecursiveActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -19,12 +20,17 @@ class VerifyPhoneVerificationController extends Controller
         try {
 
             $validator = Validator::make($request->all(), [
-                'phone_number' => 'required|string|unique:users,phone_number',
+                'phone_number' => 'required|string',
             ]);
 
             // Handle validation errors
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            if (User::where('phone_number', $request->phone_number)->exists()) {
+                // Handle the case where the phone number already exists
+                return $this->sendError("Phone number already taken", [], 422);
             }
 
             $token = $this->generatePhoneToken($request->phone_number);
@@ -41,12 +47,18 @@ class VerifyPhoneVerificationController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'phone_number' => 'required|string|unique:users,phone_number',
+                'token' => ['required', 'numeric', 'digits:4'],
+                'phone_number' => ['required']
             ]);
 
             // Handle validation errors
             if ($validator->fails()) {
                 return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            if (User::where('phone_number', $request->phone_number)->exists()) {
+                // Handle the case where the phone number already exists
+                return $this->sendError("Phone number already taken", [], 422);
             }
 
             $token = PhoneVerificationCode::where('token', $request->token)
@@ -58,7 +70,11 @@ class VerifyPhoneVerificationController extends Controller
                 return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
             }
 
-            return $this->sendResponse([], "Phone number verification successful", Response::HTTP_OK);
+            $token->update([
+                'is_verified' => true
+            ]);
+
+            return $this->sendResponse([], "Phone number verified successful", Response::HTTP_OK);
         } catch (\Exception $e) {
             sendToLog($e);
             return $this->sendError(serviceDownMessage(), [], Response::HTTP_SERVICE_UNAVAILABLE);

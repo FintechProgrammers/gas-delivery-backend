@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\Rules\Password;
 
 class BusinessRegistration extends FormRequest
 {
@@ -26,37 +25,47 @@ class BusinessRegistration extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['email', 'required'],
-            'phone_number' => ['required'],
-            'business_name' => ['string', 'required'],
-            'token' => ['required', 'digits:4'],
-            'photo' => ['image', 'mimes:jpeg,png,jpg,gif|max:2048'],
-            'password' => [
-                'required',
-                'string',
-                Password::min(8)->mixedCase()->numbers()->symbols(),
-                'confirmed', // for password confirmation
-            ],
+            'email' => ['nullable', 'email'],
+            'phone_number' => ['required', 'string'],
+            'business_name' => ['required', 'string'],
+            'photo' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'longitude' => ['nullable', 'numeric'], // Validate as a numeric value
+            'latitude' => ['nullable', 'numeric'], // Validate as a numeric value
+            'business_type' => ['required', 'in:retail,gas-station'],
+            'dpr_number' => ['nullable', 'string', 'required_if:business_type,gas-station'],
         ];
     }
 
-    public function messages()
+    /**
+     * Custom validation error messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
     {
         return [
-            'email.required' => 'Email is required.',
-            'email.email' => 'Email must be a valid email address.',
-            'business_name.required' => 'First name is required.',
-            'business_name.string' => 'First name must be a string.',
-            'password.required' => 'Password is required.',
-            'password.string' => 'Password must be a string.',
-            'password.min' => 'Password must be at least 8 characters.',
-            'password.mixed_case' => 'Password must contain both uppercase and lowercase letters.',
-            'password.numbers' => 'Password must contain at least one number.',
-            'password.symbols' => 'Password must contain at least one special character.',
-            'password.confirmed' => 'Password confirmation does not match.',
+            'email.email' => 'The email must be a valid email address.',
+            'phone_number.required' => 'The phone number is required.',
+            'business_name.required' => 'The business name is required.',
+            'business_name.string' => 'The business name must be a string.',
+            'photo.string' => 'The photo must be a valid string.',
+            'address.string' => 'The address must be a valid string.',
+            'longitude.numeric' => 'The longitude must be a valid number.',
+            'latitude.numeric' => 'The latitude must be a valid number.',
+            'business_type.required' => 'The business type is required.',
+            'business_type.in' => 'The business type must be either "retail" or "gas-station".',
+            'dpr_number.required_if' => 'The DPR number is required for gas stations.',
+            'dpr_number.string' => 'The DPR number must be a string.',
         ];
     }
 
+    /**
+     * Handle a failed validation attempt.
+     *
+     * @param Validator $validator
+     * @throws HttpResponseException
+     */
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([

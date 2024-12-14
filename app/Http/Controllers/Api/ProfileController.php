@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\SetPasswordRequest;
 use App\Http\Requests\UpdateBusinessDetails;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -125,6 +127,33 @@ class ProfileController extends Controller
             logger($e);
 
             return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
+    }
+
+    function setPassword(SetPasswordRequest  $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $user = $request->user();
+
+            // Check if the user has already set a password
+            if (!is_null($user->password)) {
+                return $this->sendError("You have already set a password.", [], 500);
+            }
+
+            $user->update([
+                'password' => $request->password
+            ]);
+
+            DB::commit();
+
+            return $this->sendResponse(null, "Password updated successfully", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
         }
     }
 }

@@ -36,6 +36,8 @@ Route::prefix('auth')->group(function () {
             Route::post('verify', 'verifyCode');
         });
 
+        Route::post('/password/set', [ProfileController::class, 'setPassword'])->middleware('auth:api');
+
         Route::post('/register', BusinessRegisterController::class);
         Route::post('/login', BusinessLoginController::class);
     });
