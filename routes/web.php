@@ -17,4 +17,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('queue-work', function () {
+    return Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
+})->name('queue.work');
+
 require __DIR__ . '/auth.php';
