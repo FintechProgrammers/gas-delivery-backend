@@ -68,7 +68,7 @@ class RegisterController extends Controller
                 'longitude' => $request->longitude,
                 'latitude' => $request->latitude,
                 'dpr_number' => $request->dpr_number,
-                'bussiness_type' => $request->bussiness_type
+                'business_type' => $request->business_type
             ]);
 
             // $mailData = [

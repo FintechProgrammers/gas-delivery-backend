@@ -32,7 +32,7 @@ class BusinessRegistration extends FormRequest
             'address' => ['nullable', 'string'],
             'longitude' => ['nullable', 'numeric'], // Validate as a numeric value
             'latitude' => ['nullable', 'numeric'], // Validate as a numeric value
-            'business_type' => ['required', 'in:retail,gas-station'],
+            'business_type' => ['required', 'string', 'in:retail,gas-station'],
             'dpr_number' => ['nullable', 'string', 'required_if:business_type,gas-station'],
         ];
     }
