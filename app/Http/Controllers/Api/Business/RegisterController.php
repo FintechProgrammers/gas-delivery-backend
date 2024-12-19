@@ -38,13 +38,13 @@ class RegisterController extends Controller
         try {
             DB::beginTransaction();
 
-            $phoneToken = PhoneVerificationCode::where('phone_number', $validated->phone_number)
-                ->where('is_verified', true)
-                ->first();
+            // $phoneToken = PhoneVerificationCode::where('phone_number', $validated->phone_number)
+            //     ->where('is_verified', true)
+            //     ->first();
 
-            if (!$phoneToken) {
-                return $this->sendError("Kindly verify your phone number before proceeding", [], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
+            // if (!$phoneToken) {
+            //     return $this->sendError("Kindly verify your phone number before proceeding", [], Response::HTTP_UNPROCESSABLE_ENTITY);
+            // }
 
             // $photoUrl = null;
 

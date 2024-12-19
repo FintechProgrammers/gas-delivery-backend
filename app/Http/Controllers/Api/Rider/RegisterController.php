@@ -35,14 +35,14 @@ class RegisterController extends Controller
             DB::beginTransaction();
 
             // validate phone number otp
-            $phoneToken = PhoneVerificationCode::where('token', $validated->token)
-                ->where('phone_number', $validated->phone_number)
-                ->where('created_at', '>', now()->subSeconds(3600))
-                ->first();
+            // $phoneToken = PhoneVerificationCode::where('token', $validated->token)
+            //     ->where('phone_number', $validated->phone_number)
+            //     ->where('created_at', '>', now()->subSeconds(3600))
+            //     ->first();
 
-            if (!$phoneToken) {
-                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            }
+            // if (!$phoneToken) {
+            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
+            // }
 
             $vehicle_image = null;
 
@@ -96,7 +96,7 @@ class RegisterController extends Controller
                 'token' => $token,
             ];
 
-            $phoneToken->delete();
+            // $phoneToken->delete();
 
             DB::commit();
 
