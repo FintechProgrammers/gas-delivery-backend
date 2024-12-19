@@ -61,18 +61,18 @@ class VerifyPhoneVerificationController extends Controller
                 return $this->sendError("Phone number already taken", [], 422);
             }
 
-            $token = PhoneVerificationCode::where('token', $request->token)
-                ->where('phone_number', $request->phone_number)
-                ->where('created_at', '>', now()->subSeconds(3600))
-                ->first();
+            // $token = PhoneVerificationCode::where('token', $request->token)
+            //     ->where('phone_number', $request->phone_number)
+            //     ->where('created_at', '>', now()->subSeconds(3600))
+            //     ->first();
 
-            if (!$token) {
-                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            }
+            // if (!$token) {
+            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
+            // }
 
-            $token->update([
-                'is_verified' => true
-            ]);
+            // $token->update([
+            //     'is_verified' => true
+            // ]);
 
             return $this->sendResponse([], "Phone number verified successful", Response::HTTP_OK);
         } catch (\Exception $e) {
