@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountVerificationController;
 use App\Http\Controllers\Api\Business\GasPricingController;
 use App\Http\Controllers\Api\Business\LoginController as BusinessLoginController;
+use App\Http\Controllers\Api\Business\OrderController as BusinessOrderController;
 use App\Http\Controllers\Api\Business\RegisterController as BusinessRegisterController;
 use App\Http\Controllers\Api\Business\SettingsController;
 use App\Http\Controllers\Api\CountryController;
@@ -12,10 +13,12 @@ use App\Http\Controllers\Api\GasPriceController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\RatingController;
+use App\Http\Controllers\Api\RecoverPasswordController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
 use App\Http\Controllers\Api\Rider\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
@@ -29,6 +32,11 @@ Route::prefix('auth')->group(function () {
 
     Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
     Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
+
+    Route::controller(RecoverPasswordController::class)->prefix('password')->group(function () {
+        Route::post('/forgot', 'forgotPassword');
+        Route::post('/reset', 'resetPassword');
+    });
 
     Route::prefix('business')->group(function () {
         Route::controller(VerifyPhoneVerificationController::class)->prefix('phone')->group(function () {
@@ -107,6 +115,10 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('opening/days', 'openingDays');
             Route::post('availability', 'toggleAvailability');
         });
+
+        Route::controller(BusinessOrderController::class)->prefix('orders')->group(function () {
+            Route::get('', 'index');
+        });
     });
 
     Route::prefix('rider')->group(function () {
@@ -130,6 +142,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(AccountVerificationController::class)->prefix('account')->group(function () {
         Route::post('/email/verify', 'verifyEmail');
         Route::post('/email/token', 'sentEmailToken');
+    });
+
+    Route::controller(TransactionController::class)->prefix('transactions')->group(function () {
+        Route::get('', 'index');
+        Route::get('/{transaction}', 'show');
     });
 });
 

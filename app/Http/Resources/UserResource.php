@@ -40,7 +40,8 @@ class UserResource extends JsonResource
             'vehicle_details' => optional($this->profile)->vehical_details,
             'rating' => $this->ratings,
             'start_rating' => $this->start_rating,
-            'delivery_address' => new DeliveryAddressResource($this->deliveryAddress)
+            'delivery_address' => new DeliveryAddressResource($this->deliveryAddress),
+            'wallet' => new WalletResource($this->wallet)
         ];
     }
 }
