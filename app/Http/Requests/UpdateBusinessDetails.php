@@ -14,7 +14,7 @@ class UpdateBusinessDetails extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check();
+        return true;
     }
 
     /**
@@ -29,6 +29,7 @@ class UpdateBusinessDetails extends FormRequest
             'office_address' => ['required', 'string', 'max:255'],
             'longitude' => ['required'],
             'latitude' => ['required'],
+            'photo' => ['required'],
         ];
     }
 

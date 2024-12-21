@@ -58,6 +58,7 @@ class ProfileController extends Controller
 
             $user->update([
                 'business_name' => array_key_exists('business_name', $validated) && !empty($validated['business_name']) ? $validated['business_name'] : $businessProfile->business_name,
+                'profile_image' => array_key_exists('photo', $validated) && !empty($validated['photo']) ? $validated['photo'] : $businessProfile->profile_image,
             ]);
 
             $businessProfile->update(array_filter([

@@ -26,6 +26,9 @@ class BusinessRegistration extends FormRequest
     {
         return [
             'email' => ['nullable', 'email'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'date_of_birth'  => ['required', 'date_format:Y-m-d'],
             'phone_number' => ['required', 'string'],
             'business_name' => ['required', 'string'],
             'photo' => ['nullable', 'string'],

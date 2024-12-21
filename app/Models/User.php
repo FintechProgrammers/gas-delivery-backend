@@ -197,6 +197,11 @@ class User extends Authenticatable
         return round(($fiveStarRatings / $totalRatings) * 100, 2);
     }
 
+    function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id', 'id')->latest();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

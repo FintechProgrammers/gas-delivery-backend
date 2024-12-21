@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DeliveryAddressController;
 use App\Http\Controllers\Api\GasPriceController;
+use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\RatingController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
+use App\Http\Controllers\Api\WalletController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -147,6 +149,19 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(TransactionController::class)->prefix('transactions')->group(function () {
         Route::get('', 'index');
         Route::get('/{transaction}', 'show');
+    });
+
+    Route::controller(KycController::class)->prefix('kyc/verify')->group(function () {
+        Route::post('/nin', 'verifyNIN');
+        Route::post('/driver-license', 'verifyDriverLicence');
+    });
+
+    Route::controller(WalletController::class)->prefix('wallet')->group(function () {
+        Route::get('', 'index');
+        Route::post('/fund', 'fundWallet');
+        Route::post('/withdraw', 'withdraw');
+        Route::get('/banks', 'getBanks');
+        Route::post('/account/lookup', 'accountLookup');
     });
 });
 

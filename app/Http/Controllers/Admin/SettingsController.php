@@ -33,4 +33,27 @@ class SettingsController extends Controller
 
         return $this->sendResponse([], "Settings updated successfully.");
     }
+
+    function getBanks()
+    {
+        $flutterwave = new \App\Services\Flutterwave();
+
+        $response = $flutterwave->getBanks();
+
+        if (!$response['success']) {
+            return $this->sendError($response['message'], [], 500);
+        }
+
+        $response = $response['data'];
+
+        foreach ($response as $val) {
+            \App\Models\Bank::updateOrCreate(
+                ['bank_code' => $val['code']],
+                ['bank_name' => $val['name']]
+            );
+        }
+
+        return
+            $response;
+    }
 }

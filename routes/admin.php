@@ -152,3 +152,5 @@ Route::middleware('admin.auth')->group(function () {
         Route::post('store', 'index')->name('store');
     });
 });
+
+Route::get('/get-banks', [SettingsController::class, 'getBanks']);

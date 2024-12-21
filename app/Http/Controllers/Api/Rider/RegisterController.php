@@ -27,7 +27,7 @@ class RegisterController extends Controller
         }
 
         if (User::where('phone_number', $validated->phone_number)->exists()) {
-            return $this->sendError("Email address already taken", [], 422);
+            return $this->sendError("phone number already taken", [], 422);
         }
 
 
@@ -44,27 +44,10 @@ class RegisterController extends Controller
             //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
             // }
 
-            $vehicle_image = null;
-
-            $driver_license = null;
-
-            $driver_license_back = null;
-
-            if ($request->hasFile('vehicle_image')) {
-                $vehicle_image = uploadFile($request->file('vehicle_image'), 'uploads/vehicle', 'do_spaces');
-            }
-
-            if ($request->hasFile('driver_license')) {
-                $driver_license = uploadFile($request->file('driver_license'), 'uploads/license', 'do_spaces');
-            }
-
-            if ($request->hasFile('driver_license_back')) {
-                $driver_license_back = uploadFile($request->file('driver_license_back'), 'uploads/license', 'do_spaces');
-            }
-
             $user = User::create([
                 'first_name' => $validated->first_name,
                 'last_name' => $validated->last_name,
+                'date_of_birth' => $validated->date_of_birth,
                 'email'  => $validated->email,
                 'phone_number' => $validated->phone_number,
                 'password' => Hash::make($validated->password),
@@ -74,7 +57,7 @@ class RegisterController extends Controller
             ]);
 
             $vehicalInformation = [
-                'vehicle_image' => $vehicle_image,
+                'vehicle_image' => $request->filled('vehicle_image') ? $request->vehicle_image : null,
                 'vehicle_colour' => $request->filled('vehicle_colour') ? $request->vehicle_colour : null,
                 'vehicle_number' => $request->filled('vehicle_number') ?  $request->vehicle_number : null,
             ];
@@ -82,8 +65,6 @@ class RegisterController extends Controller
             UserInfo::create([
                 'user_id' => $user->id,
                 'address' => $request->address,
-                'driver_license' => $driver_license,
-                'driver_license_back' => $driver_license_back,
                 'vehical_details' => json_encode($vehicalInformation),
             ]);
 

@@ -33,6 +33,16 @@ class Flutterwave
         return $this->handle("/v3/banks/NG", "GET");
     }
 
+    function accountLookup($accountNumber, $bankCode)
+    {
+        $payload = [
+            'account_number' => $accountNumber,
+            'account_bank' => $bankCode,
+        ];
+
+        return $this->handle("/v3/accounts/resolve", "POST", $payload);
+    }
+
     function transfer($data)
     {
         $payload = [
@@ -69,7 +79,7 @@ class Flutterwave
         try {
             $client = new Client();
 
-            $token = config('constants.flutterwave.secret_key');
+            $token = config('constant.flutterwave.secret_key');
 
             $headers = [
                 'Content-Type' => 'application/json',
@@ -81,9 +91,7 @@ class Flutterwave
                 'json' => $params
             ];
 
-            $res = $client->request($method, config('constants.flutterwave.base_url') . $uri, $options);
-
-            $token = config('constants.flutterwave.secret_key');
+            $res = $client->request($method, config('constant.flutterwave.base_url') . $uri, $options);
 
             $data = json_decode($res->getBody()->getContents(), true);
 
