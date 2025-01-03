@@ -129,6 +129,8 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('/accept/{order}', 'acceptOrder');
             Route::post('/reject/{order}', 'rejectOrder');
         });
+
+        Route::post('/location/update', [ProfileController::class, 'updateLocation']);
     });
 
     Route::controller(TransactionPinController::class)->prefix('transaction/pin')->group(function () {

@@ -317,3 +317,21 @@ if (!function_exists('pricePerKm')) {
         return 100;
     }
 }
+
+if (!function_exists('getNearbyAvailableRiders')) {
+    function
+    getNearbyAvailableRiders($latitude, $longitude)
+    {
+        // Get nearby riders nearby locations from user_infos
+        $riders = \App\Models\User::where('is_business', false)
+            ->where('account_type', 'RIDER')
+            ->whereHas('profile', function ($query) use ($latitude, $longitude) {
+                $query->select('id', 'user_id', 'latitude', 'longitude')
+                    ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+                    ->having('distance', '<', maxDistance());
+            })
+            ->get();
+
+        return $riders;
+    }
+}

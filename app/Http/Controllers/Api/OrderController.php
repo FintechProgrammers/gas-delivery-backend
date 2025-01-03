@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
 use App\Http\Requests\RequestRider;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\RiderResource;
 use App\Models\DeliveryAddress;
 use App\Models\GasPricing;
 use App\Models\GasOrder;
@@ -35,6 +36,8 @@ class OrderController extends Controller
             DB::beginTransaction();
 
             $user = $request->user();
+
+            $wallet = $user->wallet;
 
             // get vendor
             $business = User::with('profile')->whereUuid($request->vendor)->first();
@@ -79,7 +82,11 @@ class OrderController extends Controller
 
             $totalAmount = $gasAmount + $deliveryFee;
 
-            GasOrder::create([
+            if ($wallet->balance < $totalAmount) {
+                return $this->sendError("Insufficient balance", [], 400);
+            }
+
+            $order = GasOrder::create([
                 'reference' => generateReference(),
                 'user_id' => $user->id,
                 'delivery_address_id' => $deliveryAddress->id,
@@ -97,7 +104,13 @@ class OrderController extends Controller
 
             DB::commit();
 
-            return $this->sendResponse([], "Order place successfully", Response::HTTP_CREATED);
+            // Fetch nearby available riders
+            $availableRiders = getNearbyAvailableRiders($deliveryAddress->latitude, $deliveryAddress->longitude);
+
+            return $this->sendResponse([
+                'order' => new OrderResource($order),
+                'available_riders' => RiderResource::collection($availableRiders)
+            ], "Order place successfully", Response::HTTP_CREATED);
         } catch (\Exception $e) {
             logger($e);
             DB::rollBack();

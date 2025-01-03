@@ -46,15 +46,15 @@ class VerifyPhoneNumberController extends Controller
             $user = $request->user();
 
             // get the verification token
-            $token = UserOtp::where('token', $validated->token)
-                ->where('user_id', $user->id)
-                ->where('purpose', 'phone_number_verification')
-                ->where('created_at', '>', now()->subSeconds(3600))
-                ->first();
+            // $token = UserOtp::where('token', $validated->token)
+            //     ->where('user_id', $user->id)
+            //     ->where('purpose', 'phone_number_verification')
+            //     ->where('created_at', '>', now()->subSeconds(3600))
+            //     ->first();
 
-            if (!$token) {
-                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            }
+            // if (!$token) {
+            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
+            // }
 
             if (!empty($user->phone_number_verified_at)) {
                 return $this->sendError('Your phone number is already verified', Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -62,7 +62,7 @@ class VerifyPhoneNumberController extends Controller
 
             $user->update(['phone_number_verified_at' => now()]);
 
-            $token->delete();
+            // $token->delete();
 
             DB::commit();
 

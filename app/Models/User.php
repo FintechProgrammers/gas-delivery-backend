@@ -105,7 +105,7 @@ class User extends Authenticatable
         }
 
         // Check fields in UserInfo model
-        $userInfo = $this->userProfile;
+        $userInfo = $this->profile;
         if ($userInfo) {
             foreach ($this->userInfoRequiredFields as $field) {
                 if (!empty($userInfo->$field)) {

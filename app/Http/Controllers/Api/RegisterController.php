@@ -60,7 +60,7 @@ class RegisterController extends Controller
 
             $code = $this->generateUserOtp($user->id, "phone_number_verification");
 
-            $user->notify(new VeryPhoneNumber($code));
+            // $user->notify(new VeryPhoneNumber($code));
 
             $token = $user->createToken('authToken')->accessToken;
 

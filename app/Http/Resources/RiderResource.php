@@ -28,7 +28,11 @@ class RiderResource extends JsonResource
             'email_verified'       => (bool) !empty($this->email_verified_at) ? true : false,
             'status'               => $this->status,
             'is_available'         => (bool) $this->is_available,
-            'vehicle_details' => optional($this->profile)->vehical_details
+            'vehicle_details' => optional($this->profile)->vehical_details,
+            'location' => [
+                'longitude' => optional($this->profile)->latitude,
+                'latitude' => optional($this->profile)->longitude
+            ]
         ];
     }
 }
