@@ -64,9 +64,11 @@ class VerifyPhoneNumberController extends Controller
 
             // $token->delete();
 
+            $user = new UserResource($user);
+
             DB::commit();
 
-            return $this->sendResponse(null, "Verified successfully.");
+            return $this->sendResponse($user, "Verified successfully.");
         } catch (\Exception $e) {
             DB::rollBack();
 

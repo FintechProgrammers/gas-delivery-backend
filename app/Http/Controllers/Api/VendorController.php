@@ -16,11 +16,12 @@ class VendorController extends Controller
         // Validate the incoming request
         $validated = (object) $request->validated();
 
-        // Retrieve the user's latitude and longitude
+        // Retrieve the user's latitude, longitude, and optional search term
         $latitude = $validated->latitude;
         $longitude = $validated->longitude;
+        $search = $request->query('search'); // Retrieve search query if provided
 
-        $vendor = $this->getNearbyVendors($latitude, $longitude);
+        $vendor = $this->getNearbyVendors($latitude, $longitude, $search);
 
         $vendor = VendorResource::collection($vendor);
 
@@ -40,7 +41,7 @@ class VendorController extends Controller
         return $this->sendResponse($vendor);
     }
 
-    private function getNearbyVendors($latitude, $longitude)
+    private function getNearbyVendors($latitude, $longitude, $search = null)
     {
         $maxDistance = maxDistance();
 
@@ -51,15 +52,20 @@ class VendorController extends Controller
                 'users.uuid as uuid',
                 'users.*',
                 DB::raw("(6371 * acos(cos(radians($latitude))
-            * cos(radians(latitude))
-            * cos(radians(longitude) - radians($longitude))
-            + sin(radians($latitude))
-            * sin(radians(latitude)))) AS distance") // Calculate distance
+                * cos(radians(latitude))
+                * cos(radians(longitude) - radians($longitude))
+                + sin(radians($latitude))
+                * sin(radians(latitude)))) AS distance") // Calculate distance
             )
-            ->where('users.status', 'active')  // Only select active business information
-            ->having('distance', '<=', $maxDistance)  // Filter by max distance
-            ->orderBy('distance', 'asc'); // Sort by distance ascending
+            ->where('users.status', 'active'); // Only select active business information
 
+        // Add a condition to search by business_name
+        if ($search) {
+            $query->where('users.business_name', 'like', '%' . $search . '%');
+        }
+
+        $query->having('distance', '<=', $maxDistance)  // Filter by max distance
+            ->orderBy('distance', 'asc'); // Sort by distance ascending
 
         // Get the data and convert it to a collection of model instances
         $results = $query->get();
