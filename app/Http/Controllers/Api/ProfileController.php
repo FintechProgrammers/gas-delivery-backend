@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateBusinessDetails;
 use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
+use App\Models\UserInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -150,6 +151,46 @@ class ProfileController extends Controller
             DB::commit();
 
             return $this->sendResponse(null, "Password updated successfully", 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            sendToLog($e);
+
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function updateRider(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'address' => ['required'],
+            'plat_number' => ['required'],
+            'vehicle_colour' => ['required'],
+            'id_number' => ['required'],
+            'vehicle_image' => ['required'],
+        ]);
+
+        // Handle validation errors
+        if ($validator->fails()) {
+            return $this->sendError('Validation error', $validator->errors(), 422);
+        }
+
+        try {
+
+            $user = $request->user();
+
+            $vehicalInformation = [
+                'vehicle_image' => $request->filled('vehicle_image') ? $request->vehicle_image : null,
+                'vehicle_colour' => $request->filled('vehicle_colour') ? $request->vehicle_colour : null,
+                'vehicle_number' => $request->filled('plat_number') ?  $request->plat_number : null,
+                'id_number' => $request->filled('id_number') ? $request->id_number : null,
+            ];
+
+            UserInfo::where('user_id', $user->id)->update([
+                'address' => $request->address,
+                'vehical_details' => json_encode($vehicalInformation)
+            ]);
+
+            return $this->sendResponse(null, "Rider details updated successfully");
         } catch (\Exception $e) {
             DB::rollBack();
             sendToLog($e);

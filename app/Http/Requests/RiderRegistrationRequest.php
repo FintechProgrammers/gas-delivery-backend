@@ -30,19 +30,12 @@ class RiderRegistrationRequest extends FormRequest
             'last_name'     => ['required', 'string', 'max:255'],
             'email'         => ['required', 'string', 'email', 'max:255'],
             'phone_number'  => ['required', 'numeric', 'digits_between:10,15'],
-            'date_of_birth'  => ['required', 'date_format:Y-m-d'],
-            'token'         => ['required', 'digits:4'], // Assuming a 4-digit token is required
             'password'      => [
                 'required',
                 'string',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
                 'confirmed', // Ensures password confirmation matches
-            ],
-            'vehicle_image' => ['nullable', 'string'], // Optional image with constraints
-            'vehicle_colour' => ['nullable', 'string', 'max:100'], // Optional field with a max length
-            'vehicle_number' => ['nullable', 'string', 'max:50'], // Optional field with max length
-            'address'       => ['nuulable', 'string', 'max:255'], // Required address with max length
-            'driver_license' => ['nullable', 'string'],
+            ]
         ];
     }
 

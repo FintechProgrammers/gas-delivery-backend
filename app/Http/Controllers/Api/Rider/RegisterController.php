@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Rider;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RiderRegistrationRequest;
 use App\Http\Resources\UserResource;
+use App\Jobs\PhoneNumberTokenJob;
 use App\Models\PhoneVerificationCode;
 use App\Models\User;
 use App\Models\UserInfo;
@@ -30,19 +31,8 @@ class RegisterController extends Controller
             return $this->sendError("phone number already taken", [], 422);
         }
 
-
         try {
             DB::beginTransaction();
-
-            // validate phone number otp
-            // $phoneToken = PhoneVerificationCode::where('token', $validated->token)
-            //     ->where('phone_number', $validated->phone_number)
-            //     ->where('created_at', '>', now()->subSeconds(3600))
-            //     ->first();
-
-            // if (!$phoneToken) {
-            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            // }
 
             $user = User::create([
                 'first_name' => $validated->first_name,
@@ -56,19 +46,21 @@ class RegisterController extends Controller
                 'phone_number_verified_at' => now(),
             ]);
 
-            $vehicalInformation = [
-                'vehicle_image' => $request->filled('vehicle_image') ? $request->vehicle_image : null,
-                'vehicle_colour' => $request->filled('vehicle_colour') ? $request->vehicle_colour : null,
-                'vehicle_number' => $request->filled('vehicle_number') ?  $request->vehicle_number : null,
-            ];
+            // $vehicalInformation = [
+            //     'vehicle_image' => $request->filled('vehicle_image') ? $request->vehicle_image : null,
+            //     'vehicle_colour' => $request->filled('vehicle_colour') ? $request->vehicle_colour : null,
+            //     'vehicle_number' => $request->filled('vehicle_number') ?  $request->vehicle_number : null,
+            // ];
 
             UserInfo::create([
                 'user_id' => $user->id,
-                'address' => $request->address,
-                'vehical_details' => json_encode($vehicalInformation),
             ]);
 
             $token = $user->createToken('auth_token')->accessToken;
+
+            $token = $this->generatePhoneToken($request->phone_number);
+
+            PhoneNumberTokenJob::dispatch($request->phone_number, $token);
 
             $user = new UserResource($user);
 
@@ -76,8 +68,6 @@ class RegisterController extends Controller
                 'user' => $user,
                 'token' => $token,
             ];
-
-            // $phoneToken->delete();
 
             DB::commit();
 

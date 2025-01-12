@@ -11,6 +11,11 @@ trait RecursiveActions
 
     function generateOtpCode()
     {
+
+        if (in_array(config("app.env"), ["local", "staging", "testing", "dev"])) {
+            return "1234";
+        }
+
         // Generate a random 4-digit OTP
         return mt_rand(1111, 9999);
     }

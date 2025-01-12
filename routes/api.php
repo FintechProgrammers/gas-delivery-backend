@@ -124,6 +124,8 @@ Route::middleware(['auth:api'])->group(function () {
     });
 
     Route::prefix('rider')->group(function () {
+        Route::post('/update', [ProfileController::class, 'updateRider']);
+
         Route::controller(OrderRequestController::class)->prefix('orders')->group(function () {
             Route::get('', 'index');
             Route::post('/accept/{order}', 'acceptOrder');
