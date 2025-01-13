@@ -34,7 +34,6 @@ class RiderRegistrationRequest extends FormRequest
                 'required',
                 'string',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
-                'confirmed', // Ensures password confirmation matches
             ]
         ];
     }

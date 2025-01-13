@@ -46,12 +46,6 @@ class RegisterController extends Controller
                 'phone_number_verified_at' => now(),
             ]);
 
-            // $vehicalInformation = [
-            //     'vehicle_image' => $request->filled('vehicle_image') ? $request->vehicle_image : null,
-            //     'vehicle_colour' => $request->filled('vehicle_colour') ? $request->vehicle_colour : null,
-            //     'vehicle_number' => $request->filled('vehicle_number') ?  $request->vehicle_number : null,
-            // ];
-
             UserInfo::create([
                 'user_id' => $user->id,
             ]);
