@@ -132,6 +132,10 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('/reject/{order}', 'rejectOrder');
         });
 
+        Route::controller(SettingsController::class)->prefix('settings')->group(function () {
+            Route::post('availability', 'toggleAvailability');
+        });
+
         Route::post('/location/update', [ProfileController::class, 'updateLocation']);
     });
 
