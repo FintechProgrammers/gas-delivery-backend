@@ -41,6 +41,7 @@ class RegisterController extends Controller
                 'email'  => $validated->email,
                 'phone_number' => $validated->phone_number,
                 'password' => Hash::make($validated->password),
+                'date_of_birth' => $validated->date_of_birth,
                 'is_business' => false,
                 'account_type' => 'RIDER',
                 'phone_number_verified_at' => now(),

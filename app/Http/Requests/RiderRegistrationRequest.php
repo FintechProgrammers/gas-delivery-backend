@@ -30,6 +30,7 @@ class RiderRegistrationRequest extends FormRequest
             'last_name'     => ['required', 'string', 'max:255'],
             'email'         => ['required', 'string', 'email', 'max:255'],
             'phone_number'  => ['required', 'string'],
+            'date_of_birth' => ['required', 'string', 'date_format: YYYY-MM-DD'],
             'password'      => [
                 'required',
                 'string',
