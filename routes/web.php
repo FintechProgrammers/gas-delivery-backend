@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\DriverRquest;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\User\AcademyController;
@@ -17,8 +18,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+Route::get('test-push', function () {
+    $user = \App\Models\User::first();
+
+    broadcast(new DriverRquest($user));
+    return 'done';
+});
+
 Route::get('queue-work', function () {
-    return Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
+    Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
 })->name('queue.work');
 
 require __DIR__ . '/auth.php';
