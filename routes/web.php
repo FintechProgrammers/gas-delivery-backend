@@ -23,6 +23,7 @@ Route::get('test-push', function () {
     $user = \App\Models\User::first();
 
     broadcast(new DriverRquest($user));
+
     return 'done';
 });
 
