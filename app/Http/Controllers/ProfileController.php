@@ -31,6 +31,7 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request)
     {
         try {
+
             $user =  $request->user();
 
             $user->update([
