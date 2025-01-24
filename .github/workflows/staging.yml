@@ -127,7 +127,7 @@ jobs:
           ACTIVE_RELEASE_PATH: ${{ matrix.server.path }}/current
           STORAGE_PATH: ${{ matrix.server.path }}/storage
           BASE_PATH: ${{ matrix.server.path }}
-          STAGE_ENV: ${{ variable.STAGE_ENV }}
+          STAGE_ENV: ${{ env.STAGE_ENV }}
         with:
           host: ${{ matrix.server.ip }}
           username: ${{ matrix.server.username }}
