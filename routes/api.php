@@ -102,6 +102,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('', 'placeOrder');
         Route::get('/show/{order}', 'orderDetails');
         Route::post('/rider/request', 'requestRider');
+        Route::get('riders', 'riders');
     });
 
     Route::prefix('business')->group(function () {

@@ -7,6 +7,7 @@ use App\Http\Requests\OrderRequest;
 use App\Http\Requests\RequestRider;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderResource;
+use App\Http\Resources\UserResource;
 use App\Models\DeliveryAddress;
 use App\Models\GasPricing;
 use App\Models\GasOrder;
@@ -153,5 +154,14 @@ class OrderController extends Controller
 
             return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    function riders()
+    {
+        $riders = User::where('account_type', 'RIDER')->where('is_available', true)->get();
+
+        $riders = UserResource::collection($riders);
+
+        return $this->sendResponse($riders, "", Response::HTTP_OK);
     }
 }
