@@ -73,16 +73,7 @@ jobs:
           port: ${{ matrix.server.port }}
           envs: GITHUB_SHA
           script: |
-            # Check if .env exists and preserve it
-            if [ -f "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env" ]; then
-              cp "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env" "${{ matrix.server.path }}/.env.backup"
-            fi
-            tar xzf ${{ matrix.server.path }}/artifacts/${GITHUB_SHA}.tar.gz -C "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
-            # Restore .env if it was backed up
-            if [ -f "${{ matrix.server.path }}/.env.backup" ]; then
-              mv "${{ matrix.server.path }}/.env.backup" "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env"
-            fi
-            #mkdir -p "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
+            mkdir -p "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
             tar xzf ${{ matrix.server.path }}/artifacts/${GITHUB_SHA}.tar.gz -C "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
             rm -rf ${{ matrix.server.path }}/releases/${GITHUB_SHA}/storage
             mkdir -p ${{ matrix.server.path }}/storage/{app,public,framework,logs}
@@ -144,8 +135,8 @@ jobs:
           port: ${{ matrix.server.port }}
           envs: GITHUB_SHA,RELEASE_PATH,ACTIVE_RELEASE_PATH,STORAGE_PATH,BASE_PATH,ENV_PATH,STAGE_ENV
           script: |
-            # Create a symbolic link for the .env file from the base directory
-            ln -sf $BASE_PATH/.env $ACTIVE_RELEASE_PATH/.env
+            printf "%s" "$STAGE_ENV" > "${BASE_PATH}/.env"
+            ln -s -f ${BASE_PATH}/.env $RELEASE_PATH
             ln -s -f $STORAGE_PATH $RELEASE_PATH
             ln -s -n -f $RELEASE_PATH $ACTIVE_RELEASE_PATH
             chmod -R 755 ${ACTIVE_RELEASE_PATH}/bootstrap/cache
