@@ -135,6 +135,8 @@ jobs:
           port: ${{ matrix.server.port }}
           envs: GITHUB_SHA,RELEASE_PATH,ACTIVE_RELEASE_PATH,STORAGE_PATH,BASE_PATH,ENV_PATH,STAGE_ENV
           script: |
+            # Create a symbolic link for the .env file from the base directory
+            ln -sf $BASE_PATH/.env $ACTIVE_RELEASE_PATH/.env
             ln -s -f $STORAGE_PATH $RELEASE_PATH
             ln -s -n -f $RELEASE_PATH $ACTIVE_RELEASE_PATH
             chmod -R 755 ${ACTIVE_RELEASE_PATH}/bootstrap/cache
