@@ -73,7 +73,16 @@ jobs:
           port: ${{ matrix.server.port }}
           envs: GITHUB_SHA
           script: |
-            mkdir -p "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
+            # Check if .env exists and preserve it
+            if [ -f "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env" ]; then
+              cp "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env" "${{ matrix.server.path }}/.env.backup"
+            fi
+            tar xzf ${{ matrix.server.path }}/artifacts/${GITHUB_SHA}.tar.gz -C "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
+            # Restore .env if it was backed up
+            if [ -f "${{ matrix.server.path }}/.env.backup" ]; then
+              mv "${{ matrix.server.path }}/.env.backup" "${{ matrix.server.path }}/releases/${GITHUB_SHA}/.env"
+            fi
+            #mkdir -p "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
             tar xzf ${{ matrix.server.path }}/artifacts/${GITHUB_SHA}.tar.gz -C "${{ matrix.server.path }}/releases/${GITHUB_SHA}"
             rm -rf ${{ matrix.server.path }}/releases/${GITHUB_SHA}/storage
             mkdir -p ${{ matrix.server.path }}/storage/{app,public,framework,logs}
