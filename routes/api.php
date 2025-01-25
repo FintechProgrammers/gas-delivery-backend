@@ -102,7 +102,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('', 'placeOrder');
         Route::get('/show/{order}', 'orderDetails');
         Route::post('/rider/request', 'requestRider');
-        Route::get('riders', 'riders');
+        Route::get('riders', 'getNearbyRiders');
+        Route::post('/cancel/{order}', 'cancelOrder');
+        Route::get('/complete', 'complete');
     });
 
     Route::prefix('business')->group(function () {
@@ -131,6 +133,8 @@ Route::middleware(['auth:api'])->group(function () {
             Route::get('', 'index');
             Route::post('/accept/{order}', 'acceptOrder');
             Route::post('/reject/{order}', 'rejectOrder');
+            Route::post('/start/{order}', 'startTripe');
+            Route::post('/complete/{order}', 'completeTripe');
         });
 
         Route::controller(SettingsController::class)->prefix('settings')->group(function () {
@@ -148,7 +152,7 @@ Route::middleware(['auth:api'])->group(function () {
     });
 
     Route::post('/riders/rate/{userId}', [RatingController::class, 'store']);
-    Route::get('/riders//ratings/{userId}', [RatingController::class, 'show']);
+    Route::get('/riders/ratings/{userId}', [RatingController::class, 'show']);
 
     Route::controller(AccountVerificationController::class)->prefix('account')->group(function () {
         Route::post('/email/verify', 'verifyEmail');
@@ -171,6 +175,9 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/withdraw', 'withdraw');
         Route::get('/banks', 'getBanks');
         Route::post('/account/lookup', 'accountLookup');
+        Route::post('/bank/account/create', 'addAccount');
+        Route::get('/bank/account', 'bankAccounts');
+        Route::delete('/bank/account/delete/{account}', 'deleteBankAccount');
     });
 });
 

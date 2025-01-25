@@ -202,6 +202,7 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'user_id', 'id')->latest();
     }
 
+
     /**
      * The attributes that should be hidden for serialization.
      *

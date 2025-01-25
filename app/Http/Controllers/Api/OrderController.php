@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\DriverRquest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderRequest;
 use App\Http\Requests\RequestRider;
@@ -12,13 +13,22 @@ use App\Models\DeliveryAddress;
 use App\Models\GasPricing;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
+use App\Models\Transaction;
 use App\Models\User;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 class OrderController extends Controller
 {
+    protected $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
     function index(Request $request)
     {
         $user = $request->user();
@@ -30,93 +40,25 @@ class OrderController extends Controller
         return $this->sendResponse($orders, "", Response::HTTP_OK);
     }
 
-    function placeOrder(OrderRequest $request)
+    /**
+     * Place a new order.
+     *
+     * @param OrderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function placeOrder(OrderRequest $request)
     {
-        try {
+        $user = $request->user();
 
-            DB::beginTransaction();
+        $requestData = $request->validated();
 
-            $user = $request->user();
+        $result = $this->orderService->placeOrder($user, $requestData);
 
-            $wallet = $user->wallet;
-
-            // get vendor
-            $business = User::with('profile')->whereUuid($request->vendor)->first();
-
-            if (!$business) {
-                return $this->sendError("Invalid vendor selected", [], 404);
-            }
-
-            // get user delivery information
-            $deliveryAddress = DeliveryAddress::whereUuid($request->delivery_address)->first();
-
-            if (!$deliveryAddress) {
-                return $this->sendError("Invalid delivery address", [], 404);
-            }
-
-            $stationAddress = [
-                'longitude' => $business->profile->longitude,
-                'latitude' => $business->profile->latitude
-            ];
-
-            $userAddress = [
-                'longitude' => $deliveryAddress->longitude,
-                'latitude' => $deliveryAddress->latitude
-            ];
-
-            $distance = calculateDistance(
-                $userAddress['latitude'],
-                $userAddress['longitude'],
-                $stationAddress['latitude'],
-                $stationAddress['longitude']
-            );
-
-            $distance = round($distance, 2);
-
-            $pricePerKm = pricePerKm();
-
-            $deliveryFee = $distance * $pricePerKm;
-
-            $pricePerKg = $business->pricePerKg->price;
-
-            $gasAmount =  $pricePerKg * $request->gas_amount;
-
-            $totalAmount = $gasAmount + $deliveryFee;
-
-            if ($wallet->balance < $totalAmount) {
-                return $this->sendError("Insufficient balance", [], 400);
-            }
-
-            $order = GasOrder::create([
-                'reference' => generateReference(),
-                'user_id' => $user->id,
-                'delivery_address_id' => $deliveryAddress->id,
-                'business_id' => $business->id,
-                'to_distination' => json_encode($stationAddress),
-                'from_distination' => json_encode($userAddress),
-                'distance' => $distance,
-                'delivery_fee' => $deliveryFee,
-                'total_amount' => $totalAmount,
-                'gas_amount' => $gasAmount, //how much gas to fill
-                'gas_size' => $request->gas_amount . 'kg', // how many kg of gas to fill
-                'cylinder_size' => $request->cylinder_size . 'kg', // cylinder size of customer
-                'price_per_km' => $pricePerKm, // price per km of customer
-            ]);
-
-            DB::commit();
-
-            // Fetch nearby available riders
-            $availableRiders = getNearbyAvailableRiders($deliveryAddress->latitude, $deliveryAddress->longitude);
-
-            return $this->sendResponse([
-                'order' => new OrderResource($order),
-                'available_riders' => RiderResource::collection($availableRiders)
-            ], "Order place successfully", Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            logger($e);
-            DB::rollBack();
-            return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($result['success']) {
+            return $this->sendResponse($result['data'], $result['message'], $result['status']);
         }
+
+        return $this->sendError($result['message'], [], $result['status']);
     }
 
     function orderDetails(GasOrder $order)
@@ -145,6 +87,8 @@ class OrderController extends Controller
 
             OrderRider::updateOrCreate(['rider_id' => $rider->id, 'order_id' => $order->id], ['status' => 'pending']);
 
+            broadcast(new DriverRquest($rider, $order));
+
             DB::commit();
 
             return $this->sendResponse([], "Rider Requested successfully", Response::HTTP_OK);
@@ -156,12 +100,49 @@ class OrderController extends Controller
         }
     }
 
-    function riders()
+    public function getNearbyRiders(Request $request)
     {
-        $riders = User::where('account_type', 'RIDER')->where('is_available', true)->get();
+        // Get the authenticated user's location from UserInfo
+        $user = $request->user();
+        $userLatitude = $user->profile->latitude;
+        $userLongitude = $user->profile->longitude;
 
-        $riders = UserResource::collection($riders);
+        // Radius in kilometers
+        $radius = 30;
 
-        return $this->sendResponse($riders, "", Response::HTTP_OK);
+        // Haversine formula to calculate distance
+        $riders = User::where('account_type', 'RIDER')
+            ->where('is_available', true)
+            ->join('user_infos', 'users.id', '=', 'user_infos.user_id') // Join UserInfo table
+            ->selectRaw(
+                'users.*, 
+            (6371 * acos(cos(radians(?)) * cos(radians(user_infos.latitude)) * cos(radians(user_infos.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user_infos.latitude)))) AS distance',
+                [$userLatitude, $userLongitude, $userLatitude]
+            )
+            ->having('distance', '<', $radius)
+            ->orderBy('distance')
+            ->get();
+
+        // Transform the riders using a resource
+        $riders = RiderResource::collection($riders);
+
+        return $this->sendResponse($riders, "Riders within 30km radius", Response::HTTP_OK);
+    }
+
+    /**
+     * Complete an order.
+     *
+     * @param GasOrder $order
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function complete(GasOrder $order)
+    {
+        $result = $this->orderService->completeOrder($order);
+
+        if ($result['success']) {
+            return $this->sendResponse([], $result['message'], $result['status']);
+        }
+
+        return $this->sendError($result['message'], [], $result['status']);
     }
 }

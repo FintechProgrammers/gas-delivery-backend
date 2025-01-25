@@ -2,32 +2,31 @@
 
 namespace App\Events;
 
-use App\Http\Resources\OrderResource;
-use App\Http\Resources\UserResource;
-use App\Models\GasOrder;
 use App\Models\User;
+use App\Models\GasOrder;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DriverRquest implements ShouldBroadcast
+class TripCompleted implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user;
     public $order;
+    public $rider;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, GasOrder $order)
+    public function __construct(User $user, GasOrder $order, User $rider)
     {
         $this->user = $user;
         $this->order = $order;
+        $this->rider = $rider;
     }
 
     /**
@@ -37,8 +36,9 @@ class DriverRquest implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        // Broadcast to a private channel specific to the user who made the order
         return [
-            new PrivateChannel('request.rider.' . $this->order->uuid),
+            new PrivateChannel('trip.completed.' . $this->user->id),
         ];
     }
 
@@ -50,8 +50,26 @@ class DriverRquest implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'user' => new UserResource($this->order->user),
-            'order' => new OrderResource($this->order),
+            'message' => 'Your trip has been completed.',
+            'order' => [
+                'id' => $this->order->uuid,
+                'status' => $this->order->status,
+                'final_cylinder_size' => $this->order->final_cylinder_size,
+            ],
+            'rider' => [
+                'id' => $this->rider->uuid,
+                'name' => $this->rider->name,
+            ],
         ];
+    }
+
+    /**
+     * The event's broadcast name.
+     *
+     * @return string
+     */
+    public function broadcastAs(): string
+    {
+        return 'trip.completed';
     }
 }

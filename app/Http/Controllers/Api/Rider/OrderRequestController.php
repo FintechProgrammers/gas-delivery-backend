@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Api\Rider;
 
+use App\Events\RiderAcceptedOrder;
+use App\Events\RiderRejectedOrder;
+use App\Events\TripCompleted;
+use App\Events\TripStarted;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RiderOrderResource;
 use App\Models\GasOrder;
@@ -23,27 +27,28 @@ class OrderRequestController extends Controller
         return $this->sendResponse($orderRequest, "", Response::HTTP_OK);
     }
 
-    public function acceptOrder(OrderRider $order)
+    public function acceptOrder(Request $request, GasOrder $order)
     {
         try {
             // Ensure there is an associated gas order
-            $gasOrder = $order->order;
-            $rider = $order->user;
 
-            if (!$gasOrder) {
-                return $this->sendError("Associated order not found", [], Response::HTTP_NOT_FOUND);
-            }
+            $rider = $request->user();
+
+            $user = $order->user;
 
             DB::beginTransaction();
 
             // Update the OrderRider and the associated GasOrder
-            $order->update(['status' => 'accepted']);
+            $order->update(['rider_id' => $rider->id]);
 
-            $gasOrder->update(['rider_id' => $order->rider_id, 'status' => 'active']);
+            OrderRider::where('order_id', $order->id)->where('rider_id', $rider->id)->update(['status' => 'accepted']);
 
             $rider->update([
                 'is_available' => false
             ]);
+
+            // Trigger the event
+            event(new RiderAcceptedOrder($user, $order, $rider));
 
             DB::commit();
 
@@ -56,26 +61,26 @@ class OrderRequestController extends Controller
         }
     }
 
-    public function rejectOrder(OrderRider $order)
+    public function rejectOrder(Request $request, GasOrder $order)
     {
         try {
             // Ensure there is an associated gas order
-            $gasOrder = $order->order;
-            $rider = $order->user;
+            $rider = $request->user();
 
-            if (!$gasOrder) {
-                return $this->sendError("Associated order not found", [], Response::HTTP_NOT_FOUND);
-            }
+            $user = $order->user;
 
             DB::beginTransaction();
 
-            // Reset rider_id and status on the gas order, then delete the OrderRider record
-            $gasOrder->update(['rider_id' => null, 'status' => 'pending']);
-            $order->delete();
+            OrderRider::where('order_id', $order->id)->where('rider_id', $rider->id)->delete();
 
             $rider->update([
                 'is_available' => true
             ]);
+
+            $order->update(['rider_id' => null]);
+
+            // Trigger the event
+            event(new RiderRejectedOrder($user, $order, $rider));
 
             DB::commit();
 
@@ -83,6 +88,72 @@ class OrderRequestController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             logger()->error("Failed to reject order: " . $e->getMessage(), ['exception' => $e]);
+
+            return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function startTripe(Request $request, GasOrder $order)
+    {
+        $request->validate([
+            'cylinder_size' => 'required|string'
+        ]);
+
+        try {
+            // Ensure there is an associated gas order
+            $rider = $request->user();
+
+            $user = $order->user;
+
+            DB::beginTransaction();
+
+            $order->update([
+                'status' => 'active',
+                'initial_cylinder_size' => $request->cylinder_size
+            ]);
+
+            // Trigger the TripStarted event
+            event(new TripStarted($user, $order, $rider));
+
+            DB::commit();
+
+            return $this->sendResponse([], "Order started successfully", Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error("Failed to start order: " . $e->getMessage(), ['exception' => $e]);
+
+            return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function completeTripe(Request $request, GasOrder $order)
+    {
+        $request->validate([
+            'cylinder_size' => 'required|string'
+        ]);
+
+        try {
+            // Ensure there is an associated gas order
+            $rider = $request->user();
+
+            $user = $order->user;
+
+            DB::beginTransaction();
+
+            $order->update([
+                'status' => 'active',
+                'final_cylinder_size' => $request->cylinder_size
+            ]);
+
+            // Trigger the TripCompleted event
+            event(new TripCompleted($user, $order, $rider));
+
+            DB::commit();
+
+            return $this->sendResponse([], "Order completed successfully", Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error("Failed to start order: " . $e->getMessage(), ['exception' => $e]);
 
             return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
         }

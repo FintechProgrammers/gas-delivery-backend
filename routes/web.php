@@ -18,15 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-Route::get('test-push', function () {
-    $user = \App\Models\User::first();
-
-    broadcast(new DriverRquest($user));
-
-    return 'done';
-});
-
 Route::get('queue-work', function () {
     Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
 })->name('queue.work');

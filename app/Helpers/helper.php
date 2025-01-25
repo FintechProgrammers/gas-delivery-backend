@@ -324,6 +324,7 @@ if (!function_exists('getNearbyAvailableRiders')) {
     {
         // Get nearby riders nearby locations from user_infos
         $riders = \App\Models\User::where('is_business', false)
+            ->where('is_available', true)
             ->where('account_type', 'RIDER')
             ->whereHas('profile', function ($query) use ($latitude, $longitude) {
                 $query->select('id', 'user_id', 'latitude', 'longitude')

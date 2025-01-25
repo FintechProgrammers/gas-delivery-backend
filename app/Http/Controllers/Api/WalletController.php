@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AddBankAccountRequest;
 use App\Http\Requests\WithdrawalRequest;
 use App\Http\Resources\BankResource;
 use App\Models\Bank;
+use App\Models\BankAccount;
+use App\Models\User;
 use App\Services\Flutterwave;
 use Illuminate\Http\Request;
 
@@ -92,5 +95,43 @@ class WalletController extends Controller
         }
 
         return $this->sendResponse($response['data']);
+    }
+
+    function addAccount(AddBankAccountRequest $request)
+    {
+        try {
+
+            $validated = $request->validated();
+
+            $user = $request->user();
+
+            $user->bankAccounts()->create([
+                'account_number' => $validated['account_number'],
+                'bank_code' => $validated['bank_code'],
+                'account_name' => $validated['account_name'],
+                'bank_name' => $validated['bank_name']
+            ]);
+
+            return $this->sendResponse([], "Bank account added successfully", 201);
+        } catch (\Exception $e) {
+            sendToLog($e);
+            return $this->sendError(serviceDownMessage(), [], 500);
+        }
+    }
+
+    function bankAccounts(Request $request)
+    {
+        $user = $request->user();
+
+        $accounts = $user->bankAccounts;
+
+        return $this->sendResponse($accounts);
+    }
+
+    function deleteBankAccount(BankAccount $account)
+    {
+        $account->delete();
+
+        return $this->sendResponse([], "Bank account deleted successfully");
     }
 }
