@@ -15,12 +15,9 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid');
             $table->foreignId('user_id');
-            $table->foreignId('country_id')->index();
-            $table->string('state');
-            $table->string('city');
-            $table->string('house_number')->nullable();
-            $table->longText('street');
-            $table->longText('nearest_land_mark');
+            $table->text('address')->nullable()->after('user_id');
+            $table->string('longitude')->nullable()->after('address');
+            $table->string('latitude')->nullable()->after('longitude');
             $table->softDeletes();
             $table->timestamps();
         });
