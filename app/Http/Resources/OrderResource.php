@@ -31,7 +31,15 @@ class OrderResource extends JsonResource
             'user_address' => $this->from_distination,
             'business' => new VendorResource($this->business),
             'rider' => new RiderResource($this->rider),
-            'delivery_address' => new DeliveryAddressResource($this->deliveryAddress)
+            'delivery_address' => new DeliveryAddressResource($this->deliveryAddress),
+            'pickup_address' => [
+                'longitude' => $this->deliveryAddress?->longitude,
+                'latitude' => $this->business?->profile?->latitude,
+            ],
+            'station_address' => [
+                'longitude' => $this->business?->profile?->longitude,
+                'latitude' => $this->business?->profile?->latitude,
+            ]
         ];
     }
 }

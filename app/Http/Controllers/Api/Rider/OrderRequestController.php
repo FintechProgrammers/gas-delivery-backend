@@ -7,6 +7,7 @@ use App\Events\RiderRejectedOrder;
 use App\Events\TripCompleted;
 use App\Events\TripStarted;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderOrderResource;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
@@ -52,7 +53,9 @@ class OrderRequestController extends Controller
 
             DB::commit();
 
-            return $this->sendResponse([], "Order accepted successfully", Response::HTTP_OK);
+            $order = new OrderResource($order);
+
+            return $this->sendResponse($order, "Order accepted successfully", Response::HTTP_OK);
         } catch (\Exception $e) {
             DB::rollBack();
             logger()->error("Failed to accept order: " . $e->getMessage(), ['exception' => $e]);
