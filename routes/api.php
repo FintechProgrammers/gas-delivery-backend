@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
 use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\PushNotificationController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,6 +69,13 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(VerifyPhoneNumberController::class)->prefix('phone-number')->group(function () {
         Route::post('/token/request', 'requestToken');
         Route::post('/verify', 'verifyPhoneNumber');
+    });
+
+    Route::prefix('push')->group(function () {
+        Route::controller(PushNotificationController::class)->group(function () {
+            Route::post('/subscribe', 'userSubscribed');
+            Route::post('/unsubscribe', 'userUnSubscribed');
+        });
     });
 
     Route::controller(DeliveryAddressController::class)->prefix('delivery/address')->group(function () {

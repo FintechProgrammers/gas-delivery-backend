@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -347,5 +348,16 @@ if (!function_exists('milestones')) {
             'rider_returning' => 'Rider Returning',
             'order_complete' => 'Order Complete',
         ];
+    }
+}
+
+if (!function_exists('sendPushNotification')) {
+    function sendPushNotification(User $user, $message, $title, $data = [])
+    {
+        if (!empty($user->user_push_id)) {
+            $notificationService = new \App\Services\PushNotification();
+
+            $notificationService->sendNotificationToOne($message, $title, $user->user_push_id);
+        }
     }
 }

@@ -177,6 +177,8 @@ class OrderRequestController extends Controller
             'status_time' => now(),
         ]);
 
+        sendPushNotification($order->user, "Your rider has updated the delivery status", "Order Status Updated");
+
         return response()->json(['message' => 'Order status updated successfully']);
     }
 
