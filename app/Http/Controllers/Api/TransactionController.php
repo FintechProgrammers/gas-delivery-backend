@@ -14,7 +14,7 @@ class TransactionController extends Controller
     {
         $transactions = Transaction::where('user_id', $request->user()->id)->paginate(10);
 
-        $transactions = TransactionResource::class($transactions);
+        $transactions = TransactionResource::collection($transactions);
 
         return $this->sendResponse($transactions, "", Response::HTTP_OK);
     }
