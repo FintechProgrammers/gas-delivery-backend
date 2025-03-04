@@ -11,6 +11,7 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderOrderResource;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
+use App\Models\OrderTimeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -160,5 +161,50 @@ class OrderRequestController extends Controller
 
             return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function updateStatus(Request $request, GasOrder $order)
+    {
+        // Validate the new status
+        $request->validate([
+            'status' => 'required',
+        ]);
+
+        // Add a new entry to the timeline
+        OrderTimeline::create([
+            'order_id' => $order->id,
+            'status' => $request->status,
+            'status_time' => now(),
+        ]);
+
+        return response()->json(['message' => 'Order status updated successfully']);
+    }
+
+    public function getOrderTimeline(GasOrder $order)
+    {
+        // Get completed milestones
+        $completedMilestones = $order->timeline->pluck('status')->toArray();
+
+        $milestones = milestones();
+
+        // Prepare timeline data
+        $timelineData = [];
+        foreach ($milestones as $status => $label) {
+            $timelineData[] = [
+                'label' => $label,
+                'status' => $status,
+                'completed' => in_array($status, $completedMilestones),
+                'timestamp' => $order->timeline->where('status', $status)->first()->status_time ?? null,
+            ];
+        }
+
+        return $this->sendResponse($timelineData);
+    }
+
+    function getTimelineStatus()
+    {
+        $timelineStatus = milestones();
+
+        return $this->sendResponse($timelineStatus);
     }
 }

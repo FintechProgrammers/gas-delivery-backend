@@ -336,3 +336,16 @@ if (!function_exists('getNearbyAvailableRiders')) {
         return $riders;
     }
 }
+
+
+if (!function_exists('milestones')) {
+    function milestones()
+    {
+        return [
+            'trip_started' => 'Trip Started',
+            'arrive_station' => 'Arrive Station',
+            'rider_returning' => 'Rider Returning',
+            'order_complete' => 'Order Complete',
+        ];
+    }
+}

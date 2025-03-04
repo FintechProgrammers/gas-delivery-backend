@@ -105,6 +105,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('riders', 'getNearbyRiders');
         Route::post('/cancel/{order}', 'cancelOrder');
         Route::get('/complete', 'complete');
+        Route::get('/timeline/{order}', 'getOrderTimeline');
     });
 
     Route::prefix('business')->group(function () {
@@ -135,6 +136,9 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('/reject/{order}', 'rejectOrder');
             Route::post('/start/{order}', 'startTripe');
             Route::post('/complete/{order}', 'completeTripe');
+            Route::post('/timeline/update/{order}', 'updateStatus');
+            Route::get('/timeline/{order}', 'getOrderTimeline');
+            Route::get('/milestones', 'getTimelineStatus');
         });
 
         Route::controller(SettingsController::class)->prefix('settings')->group(function () {

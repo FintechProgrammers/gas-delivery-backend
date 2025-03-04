@@ -145,4 +145,25 @@ class OrderController extends Controller
 
         return $this->sendError($result['message'], [], $result['status']);
     }
+
+    public function getOrderTimeline(GasOrder $order)
+    {
+        // Get completed milestones
+        $completedMilestones = $order->timeline->pluck('status')->toArray();
+
+        $milestones = milestones();
+
+        // Prepare timeline data
+        $timelineData = [];
+        foreach ($milestones as $status => $label) {
+            $timelineData[] = [
+                'label' => $label,
+                'status' => $status,
+                'completed' => in_array($status, $completedMilestones),
+                'timestamp' => $order->timeline->where('status', $status)->first()->status_time ?? null,
+            ];
+        }
+
+        return $this->sendResponse($timelineData);
+    }
 }

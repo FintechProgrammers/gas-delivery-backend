@@ -40,6 +40,11 @@ class GasOrder extends Model
         return $this->hasOne(DeliveryAddress::class, 'id', 'delivery_address_id');
     }
 
+    public function timeline()
+    {
+        return $this->hasMany(OrderTimeline::class, 'order_id', 'id');
+    }
+
     /**
      * Define the route model binding key for a given model.
      */
