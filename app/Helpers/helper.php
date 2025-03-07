@@ -343,10 +343,22 @@ if (!function_exists('milestones')) {
     function milestones()
     {
         return [
-            'trip_started' => 'Trip Started',
-            'arrive_station' => 'Arrive Station',
-            'rider_returning' => 'Rider Returning',
-            'order_complete' => 'Order Complete',
+            'trip_started' => [
+                'label' => 'Trip Started',
+                'description' => 'The trip has been initiated by the rider.',
+            ],
+            'arrive_station' => [
+                'label' => 'Arrive Station',
+                'description' => 'The rider has arrived at the gas station.',
+            ],
+            'rider_returning' => [
+                'label' => 'Rider Returning',
+                'description' => 'The rider is returning after refueling.',
+            ],
+            'order_complete' => [
+                'label' => 'Order Complete',
+                'description' => 'The order has been successfully completed.',
+            ],
         ];
     }
 }

@@ -155,10 +155,11 @@ class OrderController extends Controller
 
         // Prepare timeline data
         $timelineData = [];
-        foreach ($milestones as $status => $label) {
+        foreach ($milestones as $status => $data) {
             $timelineData[] = [
-                'label' => $label,
+                'label' => $data['label'],
                 'status' => $status,
+                'description' => $data['description'], // Add description here
                 'completed' => in_array($status, $completedMilestones),
                 'timestamp' => $order->timeline->where('status', $status)->first()->status_time ?? null,
             ];

@@ -39,7 +39,8 @@ class OrderResource extends JsonResource
             'station_address' => [
                 'longitude' => $this->business?->profile?->longitude,
                 'latitude' => $this->business?->profile?->latitude,
-            ]
+            ],
+            'created_at' => $this->created_at
         ];
     }
 }

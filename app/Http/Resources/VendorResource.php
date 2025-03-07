@@ -23,6 +23,7 @@ class VendorResource extends JsonResource
             'opening_hours' => $this->profile->opening_hours,
             'is_available'         => (bool) $this->is_available,
             'price_per_kg'         => optional($this->pricePerKg)->price,
+            'created_at' => $this->created_at
         ];
     }
 }
