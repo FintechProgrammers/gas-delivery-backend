@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\VendorController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
 use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\PushNotificationController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -153,7 +154,7 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('availability', 'toggleAvailability');
         });
 
-        Route::post('/location/update', [ProfileController::class, 'updateLocation']);
+        Route::post('/location/update', [ControllersProfileController::class, 'updateLocation']);
     });
 
     Route::controller(TransactionPinController::class)->prefix('transaction/pin')->group(function () {
