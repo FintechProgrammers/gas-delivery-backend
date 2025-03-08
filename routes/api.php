@@ -110,7 +110,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('', 'placeOrder');
         Route::get('/show/{order}', 'orderDetails');
         Route::post('/rider/request', 'requestRider');
-        Route::get('riders', 'getNearbyRiders');
+        Route::get('riders/{order}', 'getNearbyRiders');
         Route::post('/cancel/{order}', 'cancelOrder');
         Route::get('/complete', 'complete');
         Route::get('/timeline/{order}', 'getOrderTimeline');

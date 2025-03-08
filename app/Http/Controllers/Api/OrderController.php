@@ -100,28 +100,14 @@ class OrderController extends Controller
         }
     }
 
-    public function getNearbyRiders(Request $request)
+    public function getNearbyRiders(Request $request, GasOrder $order)
     {
-        // Get the authenticated user's location from UserInfo
-        $user = $request->user();
-        $userLatitude = $user->profile->latitude;
-        $userLongitude = $user->profile->longitude;
 
-        // Radius in kilometers
-        $radius = 30;
+        $userLongitude = $order->deliveryAddress?->longitude;
+        $userLatitude  = $order->deliveryAddress?->latitude;
 
         // Haversine formula to calculate distance
-        $riders = User::where('account_type', 'RIDER')
-            ->where('is_available', true)
-            ->join('user_infos', 'users.id', '=', 'user_infos.user_id') // Join UserInfo table
-            ->selectRaw(
-                'users.*, 
-            (6371 * acos(cos(radians(?)) * cos(radians(user_infos.latitude)) * cos(radians(user_infos.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user_infos.latitude)))) AS distance',
-                [$userLatitude, $userLongitude, $userLatitude]
-            )
-            ->having('distance', '<', $radius)
-            ->orderBy('distance')
-            ->get();
+        $riders = getNearbyAvailableRiders($userLatitude, $userLongitude);
 
         // Transform the riders using a resource
         $riders = RiderResource::collection($riders);
@@ -166,5 +152,45 @@ class OrderController extends Controller
         }
 
         return $this->sendResponse($timelineData);
+    }
+
+    /**
+     * Cancel a gas order.
+     *
+     * @param GasOrder $order The order to be canceled.
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cancelOrder(GasOrder $order)
+    {
+        // Check if the order is already canceled or cannot be canceled
+        if (!empty($order->rider_id)) {
+            return $this->sendError(
+                "This order cannot be canceled because it is not in a 'pending' state.",
+                [],
+                Response::HTTP_NOT_ACCEPTABLE
+            );
+        }
+
+        try {
+            // Update the order status to 'cancelled'
+            $order->update(['status' => 'cancelled']);
+
+            // Return a success response
+            return $this->sendResponse(
+                [],
+                "Order successfully canceled.",
+                Response::HTTP_OK
+            );
+        } catch (\Exception $e) {
+            // Log the exception for debugging purposes
+            sendToLog("Failed to cancel order: " . $e->getMessage());
+
+            // Return a generic error response
+            return $this->sendError(
+                "An error occurred while canceling the order. Please try again later.",
+                [],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

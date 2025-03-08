@@ -34,7 +34,7 @@ class OrderResource extends JsonResource
             'delivery_address' => new DeliveryAddressResource($this->deliveryAddress),
             'pickup_address' => [
                 'longitude' => $this->deliveryAddress?->longitude,
-                'latitude' => $this->business?->profile?->latitude,
+                'latitude' => $this->deliveryAddress?->latitude,
             ],
             'station_address' => [
                 'longitude' => $this->business?->profile?->longitude,
