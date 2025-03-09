@@ -319,9 +319,27 @@ if (!function_exists('pricePerKm')) {
     }
 }
 
+// if (!function_exists('getNearbyAvailableRiders')) {
+//     function
+//     getNearbyAvailableRiders($latitude, $longitude)
+//     {
+//         // Get nearby riders nearby locations from user_infos
+//         $riders = \App\Models\User::where('is_business', false)
+//             ->where('is_available', true)
+//             ->where('account_type', 'RIDER')
+//             ->whereHas('profile', function ($query) use ($latitude, $longitude) {
+//                 $query->select('id', 'user_id', 'latitude', 'longitude')
+//                     ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+//                     ->having('distance', '<', maxDistance());
+//             })
+//             ->get();
+
+//         return $riders;
+//     }
+// }
+
 if (!function_exists('getNearbyAvailableRiders')) {
-    function
-    getNearbyAvailableRiders($latitude, $longitude)
+    function getNearbyAvailableRiders($latitude, $longitude)
     {
         // Get nearby riders nearby locations from user_infos
         $riders = \App\Models\User::where('is_business', false)
@@ -332,6 +350,10 @@ if (!function_exists('getNearbyAvailableRiders')) {
                     ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
                     ->having('distance', '<', maxDistance());
             })
+            ->with(['profile' => function ($query) use ($latitude, $longitude) {
+                $query->select('id', 'user_id', 'latitude', 'longitude')
+                    ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude]);
+            }])
             ->get();
 
         return $riders;

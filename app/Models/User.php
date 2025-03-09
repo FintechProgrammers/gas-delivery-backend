@@ -165,6 +165,16 @@ class User extends Authenticatable
         return $this->phone_number;
     }
 
+    function rides()
+    {
+        return $this->hasMany(GasOrder::class, 'rider_id', 'id')->where('status', 'completes');
+    }
+
+    function totalRides()
+    {
+        return $this->rides()->count();
+    }
+
     function pricing()
     {
         return $this->hasMany(GasPricing::class, 'business_id', 'id')->latest();

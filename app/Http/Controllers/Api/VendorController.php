@@ -73,7 +73,9 @@ class VendorController extends Controller
         // Map the results to Eloquent model instances
         $nearbyBusinesses = $results->map(function ($item) {
             $user = \App\Models\User::whereId($item->user_id)->where('is_business', true)->first();
-            $user->distance = $item->distance;
+            if ($user) { // Check if the user is not null
+                $user->distance = $item->distance;
+            }
             return $user;
         });
 

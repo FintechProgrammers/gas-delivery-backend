@@ -33,7 +33,8 @@ class RiderResource extends JsonResource
                 'longitude' => optional($this->profile)->latitude,
                 'latitude' => optional($this->profile)->longitude
             ],
-            'distance' => $this->when(isset($this->distance), round($this->distance, 2)), // Include distance if calculated
+            'total_rides' => $this->totalRides(),
+            'distance' => $this->when(isset($this->profile->distance), round($this->profile->distance, 2)), // Include distance if calculated
             'created_at' => $this->created_at
         ];
     }
