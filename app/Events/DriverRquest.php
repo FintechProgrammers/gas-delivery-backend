@@ -50,7 +50,7 @@ class DriverRquest implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'user' => new UserResource($this->order->user),
+            // 'user' => new UserResource($this->order->user),
             'order' => new OrderResource($this->order),
         ];
     }
