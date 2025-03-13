@@ -38,7 +38,7 @@ class DriverRquest implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('request.rider.' . $this->order->uuid),
+            new PrivateChannel('request.rider.' . $this->user->uuid),
         ];
     }
 
