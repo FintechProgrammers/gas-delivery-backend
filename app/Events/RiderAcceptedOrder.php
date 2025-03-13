@@ -38,7 +38,7 @@ class RiderAcceptedOrder implements ShouldBroadcast
     {
         // Broadcast to a private channel specific to the user who made the order
         return [
-            new PrivateChannel('order.accepted.' . $this->user->id),
+            new Channel('order.accepted.' . $this->user->id),
         ];
     }
 

@@ -10,18 +10,18 @@ Broadcast::channel("request.rider.{riderId}", function () {
     return true;
 });
 
-Broadcast::channel('order.accepted.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+Broadcast::channel('order.accepted.{userId}', function () {
+    return true;
 });
 
-Broadcast::channel('order.rejected.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+Broadcast::channel('order.rejected.{userId}', function () {
+    return true;
 });
 
-Broadcast::channel('trip.started.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+Broadcast::channel('trip.started.{userId}', function () {
+    return true;
 });
 
-Broadcast::channel('trip.completed.{userId}', function ($user, $userId) {
-    return (int) $user->id === (int) $userId;
+Broadcast::channel('trip.completed.{userId}', function () {
+    return true;
 });

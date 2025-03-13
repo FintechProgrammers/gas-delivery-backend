@@ -38,7 +38,7 @@ class TripCompleted implements ShouldBroadcast
     {
         // Broadcast to a private channel specific to the user who made the order
         return [
-            new PrivateChannel('trip.completed.' . $this->user->id),
+            new Channel('trip.completed.' . $this->user->id),
         ];
     }
 
