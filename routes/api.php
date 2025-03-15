@@ -113,7 +113,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/rider/request', 'requestRider');
         Route::get('riders/{order}', 'getNearbyRiders');
         Route::post('/cancel/{order}', 'cancelOrder');
-        Route::get('/complete', 'complete');
+        Route::post('/complete/{order}', 'complete');
         Route::get('/timeline/{order}', 'getOrderTimeline');
     });
 

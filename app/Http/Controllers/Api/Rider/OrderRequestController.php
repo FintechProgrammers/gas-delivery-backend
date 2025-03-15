@@ -150,7 +150,7 @@ class OrderRequestController extends Controller
             ]);
 
             // Trigger the TripCompleted event
-            event(new TripCompleted($user, $order, $rider));
+            event(new TripCompleted($order->user, $order, $rider));
 
             DB::commit();
 

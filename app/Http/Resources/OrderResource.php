@@ -31,6 +31,7 @@ class OrderResource extends JsonResource
             'user_address' => $this->from_distination,
             'business' => new VendorResource($this->business),
             'rider' => new RiderResource($this->rider),
+            'customer' => new UserResource($this->user),
             'delivery_address' => new DeliveryAddressResource($this->deliveryAddress),
             'pickup_address' => [
                 'longitude' => $this->deliveryAddress?->longitude,
@@ -40,7 +41,8 @@ class OrderResource extends JsonResource
                 'longitude' => $this->business?->profile?->longitude,
                 'latitude' => $this->business?->profile?->latitude,
             ],
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at
         ];
     }
 }
