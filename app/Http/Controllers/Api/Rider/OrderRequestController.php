@@ -14,6 +14,7 @@ use App\Models\OrderRider;
 use App\Models\OrderTimeline;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Stripe\Climate\Order;
 use Symfony\Component\HttpFoundation\Response;
 
 class OrderRequestController extends Controller
@@ -116,10 +117,16 @@ class OrderRequestController extends Controller
                 'initial_cylinder_size' => $request->cylinder_size
             ]);
 
-            // Trigger the TripStarted event
-            event(new TripStarted($user, $order, $rider));
+            OrderTimeline::create([
+                'order_id' => $order->id,
+                'status' => "trip_started",
+                'status_time' => now(),
+            ]);
 
             DB::commit();
+
+            // Trigger the TripStarted event
+            event(new TripStarted($user, $order, $rider));
 
             return $this->sendResponse([], "Order started successfully", Response::HTTP_OK);
         } catch (\Exception $e) {
@@ -147,6 +154,12 @@ class OrderRequestController extends Controller
             $order->update([
                 'status' => 'active',
                 'final_cylinder_size' => $request->cylinder_size
+            ]);
+
+            OrderTimeline::create([
+                'order_id' => $order->id,
+                'status' => "order_complete",
+                'status_time' => now(),
             ]);
 
             // Trigger the TripCompleted event
