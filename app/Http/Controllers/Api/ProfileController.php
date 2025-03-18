@@ -162,7 +162,7 @@ class ProfileController extends Controller
     function updateRider(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'address' => ['required'],
+            'address' => ['nullable'],
             'plat_number' => ['required'],
             'vehicle_colour' => ['required'],
             'id_number' => ['required'],
