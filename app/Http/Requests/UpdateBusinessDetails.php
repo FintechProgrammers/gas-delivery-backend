@@ -29,7 +29,7 @@ class UpdateBusinessDetails extends FormRequest
             'office_address' => ['required', 'string', 'max:255'],
             'longitude' => ['required'],
             'latitude' => ['required'],
-            'photo' => ['required'],
+            'photo' => ['nullable'],
         ];
     }
 
