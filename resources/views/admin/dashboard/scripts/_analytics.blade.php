@@ -83,7 +83,7 @@
                                 offsetX: -12,
                                 offsetY: 0,
                                 formatter: function(value) {
-                                    return "$" + value;
+                                    return "₦" + value;
                                 }
                             }
                         },
