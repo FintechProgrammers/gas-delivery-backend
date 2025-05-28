@@ -244,8 +244,8 @@
                                 {{-- <small class="text-muted mb-0">Front End Developer</small> --}}
                             </div><!--end media-body-->
                         </div>
-                        <a class="dropdown-item" href="pages-profile.html"><i
-                                class="las la-user fs-18 me-1 align-text-bottom"></i> Profile</a>
+                        {{-- <a class="dropdown-item" href="pages-profile.html"><i
+                                class="las la-user fs-18 me-1 align-text-bottom"></i> Profile</a> --}}
 
                         <div class="dropdown-divider mb-0"></div>
                         <a class="dropdown-item text-danger" href="{{ route('admin.profile.logout') }}"><i

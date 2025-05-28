@@ -148,6 +148,11 @@ class User extends Authenticatable
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
     }
 
+    function depositAccount()
+    {
+        return $this->hasOne(DepositAccount::class);
+    }
+
     /**
      * Get the full name of the user.
      */

@@ -44,6 +44,7 @@ class UserResource extends JsonResource
             'start_rating' => $this->start_rating,
             'delivery_address' => new DeliveryAddressResource($this->deliveryAddress),
             'wallet' => new WalletResource($this->wallet),
+            'bank_account' =>  new BankAccountResource($this->depositAccount),
             'created_at' => $this->created_at
         ];
     }

@@ -22,5 +22,5 @@ return  [
         'base_url' => env('VERIFY_ME_BASE_URL'),
         'api_key' => env('VERIFY_ME_API_KEY'),
         'secret' => env('VERIFY_ME_SECRET'),
-    ]
+    ],
 ];

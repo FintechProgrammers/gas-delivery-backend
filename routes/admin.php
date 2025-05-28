@@ -37,6 +37,8 @@ Route::middleware('admin.guest')->group(function () {
 Route::middleware('admin.auth')->group(function () {
     Route::controller(DashboardController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('', 'index')->name('index');
+        Route::get('revenue-overview', 'revenueOverview')->name('stats.revenue');
+        Route::get('stats/customers', 'customerGrowth')->name('stats.customers');
     });
 
     Route::controller(UserManagementController::class)->prefix('users')->name('users.')->group(function () {

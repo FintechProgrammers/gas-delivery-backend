@@ -27,19 +27,19 @@
                             <div class="col-lg-4 ms-auto align-self-center">
                                 <div class="d-flex justify-content-center">
                                     <div class="border-dashed rounded border-theme-color p-2 me-2 flex-grow-1 flex-basis-0">
-                                        <h5 class="fw-semibold fs-22 mb-1">75</h5>
-                                        <p class="text-muted mb-0 fw-medium">Projects</p>
+                                        <h5 class="fw-semibold fs-22 mb-1">{{ $totalProjects }}</h5>
+                                        <p class="text-muted mb-0 fw-medium">Rides</p>
                                     </div>
                                     <div class="border-dashed rounded border-theme-color p-2 me-2 flex-grow-1 flex-basis-0">
-                                        <h5 class="fw-semibold fs-22 mb-1">68%</h5>
+                                        <h5 class="fw-semibold fs-22 mb-1">{{ $successRate }}%</h5>
                                         <p class="text-muted mb-0 fw-medium">Success Rate</p>
                                     </div>
                                     <div class="border-dashed rounded border-theme-color p-2 me-2 flex-grow-1 flex-basis-0">
-                                        <h5 class="fw-semibold fs-22 mb-1">$8620</h5>
+                                        <h5 class="fw-semibold fs-22 mb-1">₦{{ number_format($totalEarnings, 2) }}</h5>
                                         <p class="text-muted mb-0 fw-medium">Earning</p>
                                     </div>
                                 </div>
-                            </div><!--end col-->
+                            </div>
                         @endif
                     </div><!--end row-->
                 </div><!--end card-body-->

@@ -395,3 +395,32 @@ if (!function_exists('sendPushNotification')) {
         }
     }
 }
+if (!function_exists('formatAsNGN')) {
+    function formatNumber($value, $isMonetary = false)
+    {
+        // Handle null or zero values
+        if (is_null($value) || $value == 0) {
+            return $isMonetary ? '₦0' : '0';
+        }
+
+        // Convert to absolute value for formatting
+        $absValue = abs($value);
+
+        if ($absValue >= 1_000_000_000) {
+            // Billions (B)
+            $formatted = number_format($absValue / 1_000_000_000, 2) + 0; // Remove trailing zeros
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'B';
+        } elseif ($absValue >= 1_000_000) {
+            // Millions (M)
+            $formatted = number_format($absValue / 1_000_000, 2) + 0;
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'M';
+        } elseif ($absValue >= 10_000) {
+            // Thousands (k)
+            $formatted = number_format($absValue / 1_000, 2) + 0;
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'k';
+        }
+
+        // Less than 10,000, format as is
+        return ($isMonetary ? '₦' : '') . number_format($absValue, $isMonetary ? 2 : 0);
+    }
+}

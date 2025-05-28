@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\GasOrder;
 use App\Models\User;
 use App\Models\UserInfo;
 use Carbon\Carbon;
@@ -90,7 +91,26 @@ class UserManagementController extends Controller
 
     function show(User $user)
     {
+
+        // Prepare data for the view
         $data['user'] = $user;
+
+        if ($user->account_type === 'RIDER') {
+
+            // Calculate total projects (completed rides)
+            $totalProjects = $user->rides()->where('status', 'completed')->count();
+
+            // Calculate success rate
+            $totalRides = GasOrder::count();
+            $successRate = $totalRides > 0 ? round(($totalProjects / $totalRides) * 100, 2) : 0;
+
+            // Calculate total earnings
+            $totalEarnings = $user->transactions()->where('status', 'completed')->where('action', 'deposit')->sum('amount');
+
+            $data['totalProjects'] = $totalProjects;
+            $data['successRate'] = $successRate;
+            $data['totalEarnings'] = $totalEarnings;
+        }
 
         return view('admin.users.show', $data);
     }

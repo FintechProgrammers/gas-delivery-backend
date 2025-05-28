@@ -23,7 +23,7 @@
                             <select class="user-select js-states form-control" name="user">
                                 <option value=""></option>
                                 @foreach ($users as $item)
-                                    <option value="{{ $item->uuid }}">{{ Str::upper($item->name) }}</option>
+                                    <option value="{{ $item->uuid }}">{{ Str::upper($item->full_name) }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -60,7 +60,7 @@
     </div>
 @endsection
 @push('scripts')
-    <script src="{{ asset('assets/libs/quill/quill.min.j') }}s"></script>
+    <script src="{{ asset('assets/libs/quill/quill.min.js') }}"></script>
     <script>
         $(".user-select").select2({
             placeholder: "Select a user",
