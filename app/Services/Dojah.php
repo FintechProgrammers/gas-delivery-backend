@@ -37,6 +37,7 @@ class Dojah
 
             $headers = [
                 'Content-Type' => 'application/json',
+                'AppId' => config('dojah.app_id'),
                 'Authorization' => $token
             ];
 

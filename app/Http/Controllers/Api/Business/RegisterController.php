@@ -38,20 +38,6 @@ class RegisterController extends Controller
         try {
             DB::beginTransaction();
 
-            // $phoneToken = PhoneVerificationCode::where('phone_number', $validated->phone_number)
-            //     ->where('is_verified', true)
-            //     ->first();
-
-            // if (!$phoneToken) {
-            //     return $this->sendError("Kindly verify your phone number before proceeding", [], Response::HTTP_UNPROCESSABLE_ENTITY);
-            // }
-
-            // $photoUrl = null;
-
-            // if ($request->hasFile('photo')) {
-            //     $photoUrl = uploadFile($request->file('photo'), 'users', 'do_spaces');
-            // }
-
             $user = User::create([
                 'business_name' => $validated->business_name,
                 // 'email'  => $validated->email,

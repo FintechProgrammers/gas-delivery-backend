@@ -11,4 +11,16 @@ class UserKyc extends Model
     use HasFactory, GeneratesUuid;
 
     protected $guarded = [];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'response' => 'array',
+        ];
+    }
 }

@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\VerifyPhoneVerificationController;
 use App\Http\Controllers\Api\WalletController;
 use App\Http\Controllers\ProfileController as ControllersProfileController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -191,6 +192,13 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/bank/account/create', 'addAccount');
         Route::get('/bank/account', 'bankAccounts');
         Route::delete('/bank/account/delete/{account}', 'deleteBankAccount');
+    });
+
+    Route::controller(VerificationController::class)->prefix('verification')->group(function () {
+        Route::post('nin', 'verifyNin');
+        Route::post('bvn', 'verifyBnv');
+        Route::post('licence', 'verifyDriversLicence');
+        Route::post('cac', 'verifyCAC');
     });
 });
 
