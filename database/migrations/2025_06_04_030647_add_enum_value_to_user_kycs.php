@@ -14,8 +14,13 @@ return new class extends Migration
         Schema::table('user_kycs', function (Blueprint $table) {
             $table->dropColumn('statis');
             $table->enum('service', ['nin', 'drivers_license', 'voters_card', 'cac', 'passport', 'bvn'])->change();
-            $table->enum('status', ['pending', 'approved', 'declined'])->after('service');
         });
+
+        if (!Schema::hasColumn('user_kycs', 'status')) {
+            Schema::table('user_kycs', function (Blueprint $table) {
+                $table->enum('status', ['pending', 'approved', 'declined'])->after('service');
+            });
+        }
     }
 
     /**
