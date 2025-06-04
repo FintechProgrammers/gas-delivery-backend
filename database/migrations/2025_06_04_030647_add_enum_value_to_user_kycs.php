@@ -12,9 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_kycs', function (Blueprint $table) {
-            $table->dropColumn('statis');
             $table->enum('service', ['nin', 'drivers_license', 'voters_card', 'cac', 'passport', 'bvn'])->change();
         });
+
+        if (Schema::hasColumn('user_kycs', 'statis')) {
+            Schema::table('user_kycs', function (Blueprint $table) {
+                $table->dropColumn('statis');
+            });
+        }
 
         if (!Schema::hasColumn('user_kycs', 'status')) {
             Schema::table('user_kycs', function (Blueprint $table) {
