@@ -111,10 +111,12 @@ class WalletController extends Controller
             $providusService = new \App\Services\Providus();
 
             $payload = [
-                'account_name' => $user->full_name
+                'account_name' => $user->full_name,
+                // 'bvn' => $user->bvn
             ];
 
             $response = $providusService->createDynamicBankAccount($payload);
+            // $response = $providusService->createReservedBankAccount($payload);
 
             if (!$response['success']) {
                 return $this->sendError($response['message'], [], 500);

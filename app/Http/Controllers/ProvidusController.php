@@ -21,5 +21,7 @@ class ProvidusController extends Controller
             Log::error('Invalid JSON payload', ['exception' => $e]);
             return response('Invalid JSON payload', Response::HTTP_BAD_REQUEST)->header('Content-Type', 'text/plain');
         }
+
+        return response('Success', Response::HTTP_CREATED)->header('Content-Type', 'text/plain');
     }
 }
