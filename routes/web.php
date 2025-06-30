@@ -2,6 +2,7 @@
 
 use App\Events\DriverRquest;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProvidusController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\User\AcademyController;
 use App\Http\Controllers\User\AmbassedorController;
@@ -21,5 +22,9 @@ Route::get('/', function () {
 Route::get('queue-work', function () {
     Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
 })->name('queue.work');
+
+Route::prefix('webhook/response')->group(function () {
+    Route::post('/providus', [ProvidusController::class, 'webhook']);
+});
 
 require __DIR__ . '/auth.php';

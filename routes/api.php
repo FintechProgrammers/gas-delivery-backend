@@ -185,7 +185,7 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::controller(WalletController::class)->prefix('wallet')->group(function () {
         Route::get('', 'index');
-        Route::post('/fund', 'fundWallet');
+        Route::get('/fund', 'fundWallet');
         Route::post('/withdraw', 'withdraw');
         Route::get('/banks', 'getBanks');
         Route::post('/account/lookup', 'accountLookup');

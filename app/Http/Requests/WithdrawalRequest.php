@@ -27,8 +27,9 @@ class WithdrawalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:1000'],
+            'amount' => ['required', 'numeric', 'min:100'],
             'account_number' => ['required', 'numeric'],
+            'account_name' => ['required', 'string'],
             'bank_code' => ['required', 'string'],
             'narration' => ['required', 'string'],
         ];
