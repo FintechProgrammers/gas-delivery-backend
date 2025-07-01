@@ -12,6 +12,11 @@ class Wallet extends Model
 
     protected $guarded = [];
 
+    function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
     /**
      * Get the balance attribute.
      *

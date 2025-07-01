@@ -88,6 +88,13 @@ class WalletController extends Controller
                 $wallet->update([
                     'balance' => $closingBalance
                 ]);
+
+                $amount = number_format($validated['amount'], 2);
+
+                $title = "Debit Alart";
+                $message = "Your account have been debit with {$amount} NGN";
+
+                sendPushNotification($user, $message, $title);
             }
 
             DB::commit();
