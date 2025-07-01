@@ -18,15 +18,31 @@ class ProvidusController extends Controller
             $decoded = json_decode(mb_convert_encoding($rawPayload, 'UTF-8', 'UTF-8'), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             Log::warning('Providus webhook: Invalid JSON payload.', ['error' => $e->getMessage()]);
-            return $this->rejectResponse();
+            return response()->json([
+                'requestSuccessful' => true,
+                'sessionId' => '',
+                'responseMessage' => 'system failure, retry',
+                'responseCode' => '03',
+            ], Response::HTTP_OK);
         }
 
         if (empty($decoded)) {
             Log::warning('Providus webhook: Empty payload.');
-            return $this->rejectResponse();
+            return response()->json([
+                'requestSuccessful' => true,
+                'sessionId' => '',
+                'responseMessage' => 'system failure, retry',
+                'responseCode' => '03',
+            ], Response::HTTP_OK);
         }
 
         $providedSignature = $request->header('X-Auth-Signature');
+
+        if (empty($providedSignature)) {
+            Log::warning('X-Auth-Signature is missing from the request', ['payload' => $decoded]);
+            return $this->rejectResponse($decoded['sessionId'] ?? null);
+        }
+
         $expectedSignature = strtoupper(hash('sha512', config('providus.client_id') . ':' . config('providus.client_secret')));
 
         if (!hash_equals($expectedSignature, $providedSignature)) {
@@ -103,7 +119,7 @@ class ProvidusController extends Controller
         return response()->json([
             'requestSuccessful' => true,
             'sessionId' => $decoded['sessionId'],
-            'responseMessage' => 'accepted',
+            'responseMessage' => 'success',
             'responseCode' => '00',
         ], Response::HTTP_OK);
     }
