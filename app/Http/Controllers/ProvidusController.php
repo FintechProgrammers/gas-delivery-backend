@@ -27,7 +27,7 @@ class ProvidusController extends Controller
         }
 
         $providedSignature = $request->header('X-Auth-Signature');
-        $expectedSignature = hash('sha512', config('providus.client_id') . ':' . config('providus.client_secret'));
+        $expectedSignature = strtoupper(hash('sha512', config('providus.client_id') . ':' . config('providus.client_secret')));
 
         if (!hash_equals($expectedSignature, $providedSignature)) {
             Log::warning('Providus webhook: Invalid signature.', ['payload' => $decoded]);
