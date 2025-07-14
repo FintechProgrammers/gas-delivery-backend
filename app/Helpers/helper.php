@@ -319,6 +319,30 @@ if (!function_exists('pricePerKm')) {
     }
 }
 
+if (!function_exists('calculateDeliveryFee')) {
+    function calculateDeliveryFee(float $distance): float
+    {
+        $settings = \App\Models\Setting::first();
+
+        if (!$settings) return 0;
+
+        if ($settings->delivery_rate_type === 'per_km') {
+            return ($settings->price_per_km ?? 0) * $distance;
+        }
+
+        if ($settings->delivery_rate_type === 'tiered') {
+            foreach ($settings->tiered_rates ?? [] as $tier) {
+                if ($distance >= $tier['min'] && $distance <= $tier['max']) {
+                    return $tier['price'];
+                }
+            }
+        }
+
+        return 0; // fallback
+    }
+}
+
+
 // if (!function_exists('getNearbyAvailableRiders')) {
 //     function
 //     getNearbyAvailableRiders($latitude, $longitude)

@@ -20,8 +20,8 @@ use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('admin.guest')->group(function () {
-    Route::get('', [LoginController::class, 'index'])->name('login');
-    Route::post('', [LoginController::class, 'login'])->name('login.post');
+    Route::get('/', [LoginController::class, 'index'])->name('login');
+    Route::post('/', [LoginController::class, 'login'])->name('login.post');
 
     Route::controller(AdminForgotPasswordController::class)->prefix('forgot-password')->name('forgot.password.')->group(function () {
         Route::get('', 'index')->name('index');
@@ -151,7 +151,7 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::controller(SettingsController::class)->prefix('settings')->name('settings.')->group(function () {
         Route::get('', 'index')->name('index');
-        Route::post('store', 'index')->name('store');
+        Route::post('store', 'store')->name('store');
     });
 });
 

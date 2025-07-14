@@ -174,8 +174,7 @@ class OrderService
             $distance = round($distance, 2);
 
             // Calculate delivery fee and gas amount
-            $pricePerKm = pricePerKm();
-            $deliveryFee = $distance * $pricePerKm;
+            $deliveryFee = $deliveryFee = calculateDeliveryFee($distance);
 
             $pricePerKg = $business->pricePerKg->price;
             $gasAmount = $pricePerKg * $requestData['gas_amount'];
@@ -205,7 +204,7 @@ class OrderService
                 'gas_amount' => $gasAmount,
                 'gas_size' => $requestData['gas_amount'] . 'kg',
                 'cylinder_size' => $requestData['cylinder_size'] . 'kg',
-                'price_per_km' => $pricePerKm,
+                'price_per_km' => 0,
             ]);
 
             DB::commit();

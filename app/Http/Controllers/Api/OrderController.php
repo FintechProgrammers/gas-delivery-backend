@@ -40,6 +40,17 @@ class OrderController extends Controller
         return $this->sendResponse($orders, "", Response::HTTP_OK);
     }
 
+    public function estimateDelivery(Request $request)
+    {
+        $request->validate([
+            'distance' => 'required|numeric|min:0'
+        ]);
+
+        $fee = calculateDeliveryFee($request->distance);
+
+        return $this->sendResponse(['delivery_fee' => $fee], 'Delivery fee calculated');
+    }
+
     /**
      * Place a new order.
      *

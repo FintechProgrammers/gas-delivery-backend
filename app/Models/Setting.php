@@ -10,4 +10,8 @@ class Setting extends Model
     use HasFactory;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'tiered_rates' => 'array',
+    ];
 }

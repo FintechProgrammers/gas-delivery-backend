@@ -110,6 +110,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(OrderController::class)->prefix('orders')->group(function () {
         Route::get('', 'index');
         Route::post('', 'placeOrder');
+        Route::post('/estimate-delivery', 'estimateDelivery');
         Route::get('/show/{order}', 'orderDetails');
         Route::post('/rider/request', 'requestRider');
         Route::get('riders/{order}', 'getNearbyRiders');
