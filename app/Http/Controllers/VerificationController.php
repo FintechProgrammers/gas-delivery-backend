@@ -84,15 +84,25 @@ class VerificationController extends Controller
 
             $entity = $response['data']['entity'];
             $user = auth()->user();
+            // Normalize and safely access Driver’s License entity fields
+            $firstName = strtolower(trim($entity['firstName'] ?? ''));
+            $lastName = strtolower(trim($entity['lastName'] ?? ''));
+            $dateOfBirth = date('Y-m-d', strtotime($entity['birthDate'] ?? ''));
+
+            // Normalize user data
+            $userFirstName = strtolower(trim($user->first_name));
+            $userLastName = strtolower(trim($user->last_name));
+            $userDOB = $user->date_of_birth;
 
             // Compare details
             if (
-                strtolower($entity['firstName']) !== strtolower($user->first_name) ||
-                strtolower($entity['lastName']) !== strtolower($user->last_name) ||
-                $entity['birthDate'] !== $user->date_of_birth
+                $firstName !== $userFirstName ||
+                $lastName !== $userLastName ||
+                $dateOfBirth !== $userDOB
             ) {
-                return $this->sendError("Invalid Information.", [], 400);
+                return $this->sendError("Driver’s license verification failed: information mismatch.", [], 400);
             }
+
 
             UserKyc::create([
                 'user_id' => $user->id,
@@ -130,16 +140,28 @@ class VerificationController extends Controller
             }
 
             $entity = $response['data']['entity'];
+
             $user = $request->user();
 
-            // Compare details
+            // Normalize and safely access BVN entity fields
+            $firstName = strtolower(trim($entity['first_name'] ?? ''));
+            $lastName = strtolower(trim($entity['last_name'] ?? ''));
+            $dateOfBirth = date('Y-m-d', strtotime($entity['date_of_birth'] ?? ''));
+
+            // Normalize user data
+            $userFirstName = strtolower(trim($user->first_name));
+            $userLastName = strtolower(trim($user->last_name));
+            $userDOB = $user->date_of_birth;
+
+            // Compare
             if (
-                strtolower($entity['first_name']) !== strtolower($user->first_name) ||
-                strtolower($entity['last_name']) !== strtolower($user->last_name) ||
-                $entity['date_of_birth'] !== $user->date_of_birth
+                $firstName !== $userFirstName ||
+                $lastName !== $userLastName ||
+                $dateOfBirth !== $userDOB
             ) {
-                return $this->sendError("Invalid Information.", [], 400);
+                return $this->sendError("BVN verification failed: provided information does not match our records.", [], 400);
             }
+
 
             $user->update([
                 'bvn' => $request->bvn_number,

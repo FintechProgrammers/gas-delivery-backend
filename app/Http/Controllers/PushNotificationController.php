@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PushNotificationController extends Controller
 {
@@ -15,29 +16,35 @@ class PushNotificationController extends Controller
         $this->user = Auth::user();
     }
 
-    public function userSubscribed()
+    public function userSubscribed(Request $request)
     {
         try {
-            $data = trim(file_get_contents('php://input'), "\xEF\xBB\xBF");
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'push_token' => 'required|string',
+            ]);
 
-            // Decode the contents from the webhook response
-            $decoded = json_decode(mb_convert_encoding($data, 'UTF-8', 'UTF-8'), true, 512, JSON_THROW_ON_ERROR);
-
-            $userPushId = $decoded['user_id'];
-
-            // Check if user_push_id already exists
-            $existingUser = User::where('user_push_id', $userPushId)->get()->first();
-
-            if (! $existingUser) {
-                User::whereUuid($this->user->uuid)->update([
-                    'user_push_token' => $decoded['push_token'],
-                    'user_push_id' => $decoded['user_id'],
-                ]);
-
-                return $this->sendResponse([], 'Push notification subscription successful.');
+            if ($validator->fails()) {
+                return $this->sendError('Validation error.', $validator->errors(), 422);
             }
+
+            $user = $request->user();
+
+            // Update user push token
+            $user->update([
+                'user_push_id' => $request->push_token,
+            ]);
+
+            return $this->sendResponse([], 'Push notification subscription successful.');
         } catch (\Throwable $th) {
+            // Optionally send the error to Slack or log it
             // sendToSlack($th);
+            logger()->error('Failed to subscribe user for push notifications', [
+                'error' => $th->getMessage(),
+                'user_id' => $this->user->id ?? null,
+            ]);
+
+            return $this->sendError('Something went wrong. Please try again later.', [], 500);
         }
     }
 

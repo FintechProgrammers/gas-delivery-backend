@@ -52,7 +52,7 @@ class Dojah
 
             return [
                 'success' => true,
-                'data' => $data['data'],
+                'data' => $data,
             ];
         } catch (\GuzzleHttp\Exception\RequestException $e) {
             // Log the exception message
