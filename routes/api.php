@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountVerificationController;
+use App\Http\Controllers\Api\BookmarkBusinessController;
 use App\Http\Controllers\Api\Business\GasPricingController;
 use App\Http\Controllers\Api\Business\LoginController as BusinessLoginController;
 use App\Http\Controllers\Api\Business\OrderController as BusinessOrderController;
@@ -200,6 +201,12 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('bvn', 'verifyBnv');
         Route::post('licence', 'verifyDriversLicence');
         Route::post('cac', 'verifyCAC');
+    });
+
+    Route::controller(BookmarkBusinessController::class)->prefix('vendor/bookmark')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/create', 'create');
+        Route::delete('/remove/{bookmark}', 'removeBusiness');
     });
 });
 

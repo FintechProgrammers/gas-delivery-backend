@@ -10,13 +10,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TransactionController extends Controller
 {
-    function index(Request $request)
+    public function index(Request $request)
     {
         $transactions = Transaction::where('user_id', $request->user()->id)->paginate(10);
 
-        $transactions = TransactionResource::collection($transactions);
-
-        return $this->sendResponse($transactions, "", Response::HTTP_OK);
+        // Return pagination metadata along with data
+        return $this->sendResponse([
+            'data' => TransactionResource::collection($transactions),
+            'pagination' => [
+                'current_page' => $transactions->currentPage(),
+                'last_page' => $transactions->lastPage(),
+                'per_page' => $transactions->perPage(),
+                'total' => $transactions->total(),
+                'from' => $transactions->firstItem(),
+                'to' => $transactions->lastItem(),
+            ]
+        ], 'Transactions fetched successfully.', Response::HTTP_OK);
     }
 
     function show(Transaction $transaction)
