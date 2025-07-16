@@ -6,12 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpFoundation\Response;
 
 class SettingsController extends Controller
 {
     function index()
     {
         return view('admin.settings.index');
+    }
+
+    public function getSettings(Request $request)
+    {
+        $settings = Setting::first();
+
+        if (!$settings) {
+            return $this->sendResponse([], 'No settings found.', Response::HTTP_OK);
+        }
+
+        return $this->sendResponse([
+            'minimum_withdrawal_amount'     => $settings->minimum_withdrawal_amount,
+            'maximum_withdrawal_amount'     => $settings->maximum_withdrawal_amount,
+            'withdrawal_fee'                => $settings->withdrawal_fee,
+            'delivery_rate_type'            => $settings->delivery_rate_type,
+            'price_per_km'                  => $settings->price_per_km,
+            'tiered_rates'                  => $settings->tiered_rates,
+            'referral_is_active'            => (bool) $settings->referral_is_active,
+            'referral_bonus_per_purchase'   => $settings->referral_bonus,
+        ], 'Settings fetched successfully.', Response::HTTP_OK);
     }
 
     public function store(Request $request)
@@ -28,6 +49,8 @@ class SettingsController extends Controller
             'tiered_rates.*.min'        => 'nullable|required_if:delivery_rate_type,tiered|numeric|min:0',
             'tiered_rates.*.max'        => 'nullable|required_if:delivery_rate_type,tiered|numeric|min:0|gte:tiered_rates.*.min',
             'tiered_rates.*.price'      => 'nullable|required_if:delivery_rate_type,tiered|numeric|min:0',
+            'referral_is_active'           => 'nullable|in:1',
+            'referral_bonus_per_purchase'  => 'nullable|numeric|min:0',
         ]);
 
 
@@ -43,6 +66,8 @@ class SettingsController extends Controller
             'delivery_rate_type'        => $request->delivery_rate_type,
             'price_per_km'              => $request->delivery_rate_type === 'per_km' ? $request->price_per_km : 0,
             'tiered_rates'              => $request->delivery_rate_type === 'tiered' ? $request->tiered_rates : [],
+            'referral_is_active'           => $request->has('referral_is_active'),
+            'referral_bonus'  => $request->referral_bonus_per_purchase ?? 0,
         ];
 
         // Store or update the settings

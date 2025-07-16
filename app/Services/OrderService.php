@@ -6,6 +6,7 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderResource;
 use App\Models\DeliveryAddress;
 use App\Models\GasOrder;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Transaction;
 use Illuminate\Http\Response;
@@ -97,6 +98,37 @@ class OrderService
                 $vendor->wallet->balance + $vendorAmount,
                 'Earnings from order #' . $order->id
             );
+
+            // ✅ Check if referral is active and user has a parent
+            $settings = Setting::first();
+            $referralBonus = $settings->referral_is_active ? floatval($settings->referral_bonus) : 0;
+
+            if ($referralBonus > 0 && $user->parent_id) {
+                $parent = $user->parent;
+
+                if ($parent && $parent->wallet) {
+                    $oldBalance = $parent->wallet->balance;
+                    $newBalance = $oldBalance + $referralBonus;
+
+                    // Credit parent's wallet
+                    $parent->wallet->update([
+                        'balance' => $newBalance,
+                    ]);
+
+                    // Record parent's credit transaction
+                    $this->transactionService->createTransaction(
+                        $parent,
+                        $referralBonus,
+                        'bonus',
+                        'credit',
+                        'completed',
+                        'TX' . uniqid(),
+                        $oldBalance,
+                        $newBalance,
+                        'Referral bonus from order #' . $order->reference
+                    );
+                }
+            }
 
             DB::commit();
 

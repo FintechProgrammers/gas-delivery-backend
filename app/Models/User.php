@@ -217,6 +217,10 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class, 'user_id', 'id')->latest();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(User::class, 'parent_id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

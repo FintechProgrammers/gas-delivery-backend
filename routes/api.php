@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountVerificationController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Api\BookmarkBusinessController;
 use App\Http\Controllers\Api\Business\GasPricingController;
 use App\Http\Controllers\Api\Business\LoginController as BusinessLoginController;
@@ -207,6 +208,10 @@ Route::middleware(['auth:api'])->group(function () {
         Route::get('/', 'index');
         Route::post('/create', 'create');
         Route::delete('/remove/{bookmark}', 'removeBusiness');
+    });
+
+    Route::controller(AdminSettingsController::class)->prefix('settings')->group(function () {
+        Route::get('/', 'getSettings');
     });
 });
 

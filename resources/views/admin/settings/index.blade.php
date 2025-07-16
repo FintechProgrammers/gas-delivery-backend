@@ -111,6 +111,35 @@
 
         <div class="card">
             <div class="card-body">
+                <div class="row">
+                    <h6><b>{{ __('Referral System Settings') }}</b></h6>
+
+                    {{-- Toggle Referral System --}}
+                    <div class="col-lg-4 mb-3">
+                        <label for="referral_is_active">{{ __('Enable Referral System') }}</label>
+                        <div class="form-check form-switch">
+                            <input type="hidden" name="referral_is_active" value="0">
+                            <input class="form-check-input" type="checkbox" name="referral_is_active" value="1"
+                                id="referral_is_active" {{ systemSettings()->referral_is_active ? 'checked' : '' }}>
+                        </div>
+                    </div>
+
+                    {{-- Referral Bonus Per Purchase --}}
+                    <div class="col-lg-4 mb-3">
+                        <label for="referral_bonus_per_purchase">{{ __('Referral Bonus Per Purchase') }}</label>
+                        <div class="input-group">
+                            <input type="number" min="0" name="referral_bonus_per_purchase" class="form-control"
+                                id="referral_bonus_per_purchase" value="{{ systemSettings()->referral_bonus ?? 0 }}"
+                                aria-describedby="referral-addon">
+                            <span class="input-group-text" id="referral-addon">NGN</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
                 <div class="">
                     <button class="btn btn-primary btn-block" type="submit">
                         <div class="spinner-border spinner-border-sm align-middle" style="display: none"
