@@ -81,6 +81,12 @@ class Navigation
                 'icon'  => 'iconoir-tools',
                 'hasPermission' => true
             ],
+            (object) [
+                'name'  => 'Providers',
+                'route' => 'admin.providers.index',
+                'icon'  => 'iconoir-pen-tablet-connect-wifi',
+                'hasPermission' => true
+            ],
         ];
     }
 

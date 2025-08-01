@@ -32,6 +32,7 @@ class WithdrawalRequest extends FormRequest
             'account_name' => ['required', 'string'],
             'bank_code' => ['required', 'string'],
             'narration' => ['required', 'string'],
+            'reference' => ['required', 'string']
         ];
     }
 

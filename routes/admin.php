@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProviderController;
 use App\Http\Controllers\Admin\RiderController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -152,6 +153,14 @@ Route::middleware('admin.auth')->group(function () {
     Route::controller(SettingsController::class)->prefix('settings')->name('settings.')->group(function () {
         Route::get('', 'index')->name('index');
         Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(ProviderController::class)->prefix('providers')->name('providers.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+        Route::get('/provider/{provider}', 'details')->name('details');
+        Route::post('/update/{provider}', 'update')->name('update');
+        Route::post('/toggle-feature/{provider}', 'toggleFeature')->name('toggle.feature');
     });
 });
 
