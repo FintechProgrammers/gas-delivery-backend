@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Str;
 
 class NijaPayController extends Controller
 {
@@ -256,11 +257,21 @@ class NijaPayController extends Controller
         }
 
         $data = $decoded['data'] ?? [];
+
+        if (Str::lower($data['transactionType'] ?? '') === 'credit') {
+            return  $this->payin($data);
+        }
+
+        return response()->json(['message' => 'Success'], Response::HTTP_OK);
+    }
+
+    function payin($data)
+    {
         $accountNumber = $data['accountNumber'] ?? null;
         $reference = $data['transactionReference'] ?? null;
 
         if (!$accountNumber || !$reference) {
-            Log::warning('9japay webhook: Missing account number or reference.', ['payload' => $decoded]);
+            Log::warning('9japay webhook: Missing account number or reference.');
             return $this->rejectResponse($decoded['eventId'] ?? null);
         }
 
@@ -298,7 +309,7 @@ class NijaPayController extends Controller
             'closing_balance' => $closingBalance,
             'narration' => $data['narration'] ?? null,
             'receiver_informations' => json_encode($receiverInfo),
-            'response_payload' => $rawPayload,
+            'response_payload' => json_encode($data),
             'transaction_date' => $data['transactionDate'] ?? now(),
         ]);
 
