@@ -222,6 +222,16 @@ class User extends Authenticatable
         return $this->belongsTo(User::class, 'parent_id');
     }
 
+    public function userKycs()
+    {
+        return $this->hasMany(UserKyc::class, 'user_id', 'id');
+    }
+
+    public function getCacIsVerifiedAttribute()
+    {
+        return $this->userKycs()->where('service', 'cac')->where('status', 'approved')->exists();
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

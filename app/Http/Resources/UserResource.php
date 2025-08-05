@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'phone_number' => $this->phone_number,
             'profile_image' => $this->profile_picture,
             'is_verified' => (bool) !empty($this->kyc_verified_at) ?? false,
+            'cac_is_verified' => (bool) $this->cac_is_verified,
             'phone_number_verified' => (bool) $this->phone_number_verified_at ? true : false,
             'email_verified'       => (bool) !empty($this->email_verified_at) ? true : false,
             'status'               => $this->status,
