@@ -1,6 +1,7 @@
 <?php
 
 use App\Events\DriverRquest;
+use App\Http\Controllers\NijaPayController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProvidusController;
 use App\Http\Controllers\StripeController;
@@ -25,6 +26,7 @@ Route::get('queue-work', function () {
 
 Route::prefix('webhook/response')->group(function () {
     Route::post('/providus', [ProvidusController::class, 'webhook']);
+    Route::post('/nijapay', [NijaPayController::class, 'webhook']);
 });
 
 require __DIR__ . '/auth.php';
