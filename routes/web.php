@@ -17,7 +17,7 @@ Route::get('/deposit/simulation', function () {
     $nijaPaySerice = new \App\Services\NijaPay();
 
     $data = [
-        'recipient_account_number' => '9000058460',
+        'recipient_account_number' => '9000058477',
         'amount' => 200 * 100
     ];
 

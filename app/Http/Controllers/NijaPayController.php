@@ -247,7 +247,7 @@ class NijaPayController extends Controller
         }
 
         // Verify signature
-        $providedSignature = $request->header('SECRET_KEY');
+        $providedSignature = $request->header('signature');
         $secretKey = config('nijapay.secret');
 
         // Compute expected signature as Base64(HMAC_SHA256(payload, secretKey))
