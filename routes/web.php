@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\NijaPayController;
 use App\Http\Controllers\ProvidusController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -12,12 +13,12 @@ Route::get('queue-work', function () {
     Illuminate\Support\Facades\Artisan::call('queue:work', ['--stop-when-empty' => true]);
 })->name('queue.work');
 
-Route::get('/deposit/simulation', function () {
+Route::get('/deposit/simulation', function (Request $request) {
 
     $nijaPaySerice = new \App\Services\NijaPay();
 
     $data = [
-        'recipient_account_number' => '9000058460',
+        'recipient_account_number' => $request->account_number,
         'amount' => 200 * 100
     ];
 
