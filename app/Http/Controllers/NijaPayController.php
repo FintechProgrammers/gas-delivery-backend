@@ -243,7 +243,7 @@ class NijaPayController extends Controller
 
         // Verify signature
         $providedSignature = $request->header('SECRET_KEY');
-        $expectedSignature = strtoupper(hash('sha256', config('nijapay.secret') . ':' . config('providus.client_secret')));
+        $expectedSignature = strtoupper(hash('sha256', config('nijapay.secret') . ':' . config('nijapay.secret')));
 
         if (empty($providedSignature) || !hash_equals($expectedSignature, $providedSignature)) {
             Log::warning('9japay webhook: Invalid or missing signature.', ['provided' => $providedSignature]);
