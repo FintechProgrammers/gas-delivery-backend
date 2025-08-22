@@ -243,10 +243,18 @@ class NijaPayController extends Controller
 
         // Verify signature
         $providedSignature = $request->header('SECRET_KEY');
-        $expectedSignature = strtoupper(hash('sha256', config('nijapay.secret') . ':' . config('nijapay.secret')));
+        $secretKey = config('nijapay.secret');
+
+        // Compute expected signature as Base64(HMAC_SHA256(payload, secretKey))
+        $expectedSignature = base64_encode(
+            hash_hmac('sha256', $rawPayload, $secretKey, true)
+        );
 
         if (empty($providedSignature) || !hash_equals($expectedSignature, $providedSignature)) {
-            Log::warning('9japay webhook: Invalid or missing signature.', ['provided' => $providedSignature]);
+            Log::warning('9japay webhook: Invalid or missing signature.', [
+                'provided' => $providedSignature,
+                'expected' => $expectedSignature,
+            ]);
             return $this->rejectResponse($decoded['eventId'] ?? null);
         }
 
