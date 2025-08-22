@@ -323,7 +323,7 @@ class NijaPayController extends Controller
             'narration' => $data['narration'] ?? null,
             'receiver_informations' => json_encode($receiverInfo),
             'response_payload' => json_encode($data),
-            'transaction_date' => $data['transactionDate'] ?? now(),
+            // 'transaction_date' => $data['transactionDate'] ?? now(),
         ]);
 
         // Update balance
