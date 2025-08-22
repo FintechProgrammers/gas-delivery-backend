@@ -229,6 +229,11 @@ class NijaPayController extends Controller
     {
         $rawPayload = trim(file_get_contents('php://input'), "\xEF\xBB\xBF");
 
+        Log::info('9japay webhook received', [
+            'rawPayload' => $rawPayload,
+            'headers' => $request->headers->all(),
+        ]);
+
         try {
             $decoded = json_decode(mb_convert_encoding($rawPayload, 'UTF-8', 'UTF-8'), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
