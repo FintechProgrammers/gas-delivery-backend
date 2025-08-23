@@ -35,7 +35,7 @@ class UserManagementController extends Controller
         $query = User::where('is_business', true)->withTrashed();
 
         $query = $query
-            ->when(!empty($search), fn($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")->orWhere('username', 'LIKE', "%{$search}%"))
+            ->when(!empty($search), fn($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%"))
             ->when(!empty($status), fn($query) => $query->where('status', $status))
             ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
             ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
@@ -55,7 +55,7 @@ class UserManagementController extends Controller
 
         $validator = Validator::make($request->all(), [
             'fullname' => 'required|string',
-            'username' => 'required|string|unique:users,username',
+            // 'username' => 'required|string|unique:users,username',
             'email' => 'required|email|unique:users,email',
         ]);
 
@@ -69,7 +69,7 @@ class UserManagementController extends Controller
             DB::beginTransaction();
 
             $user = User::create([
-                'username' => $request->username,
+                // 'username' => $request->username,
                 'email' => $request->email,
                 'name'  => $request->fullname,
                 'password' => Hash::make('default')
