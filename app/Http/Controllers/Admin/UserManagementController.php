@@ -30,15 +30,15 @@ class UserManagementController extends Controller
 
         $search = $request->filled('search') ? $request->search : null;
         $status = $request->filled('status')  ? $request->status : null;
-        // $accountType = $request->filled('account_type') ? $request->account_type : null;
 
         $query = User::where('is_business', true)->withTrashed();
 
         $query = $query
             ->when(
                 !empty($search),
-                fn($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")
-                // ->orWhere('username', 'LIKE', "%{$search}%")
+                fn($query) => $query->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
             )
             ->when(!empty($status), fn($query) => $query->where('status', $status))
             ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
