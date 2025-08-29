@@ -120,7 +120,7 @@
                         <div class="form-check form-switch">
                             <input type="hidden" name="referral_is_active" value="0">
                             <input class="form-check-input" type="checkbox" name="referral_is_active" value="1"
-                                id="referral_is_active" {{ systemSettings()->referral_is_active ? 'checked' : '' }}>
+                                id="referral_is_active" {{ systemSettings()?->referral_is_active ? 'checked' : '' }}>
                         </div>
                     </div>
 
@@ -129,7 +129,7 @@
                         <label for="referral_bonus_per_purchase">{{ __('Referral Bonus Per Purchase') }}</label>
                         <div class="input-group">
                             <input type="number" min="0" name="referral_bonus_per_purchase" class="form-control"
-                                id="referral_bonus_per_purchase" value="{{ systemSettings()->referral_bonus ?? 0 }}"
+                                id="referral_bonus_per_purchase" value="{{ systemSettings()?->referral_bonus ?? 0 }}"
                                 aria-describedby="referral-addon">
                             <span class="input-group-text" id="referral-addon">NGN</span>
                         </div>
