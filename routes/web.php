@@ -27,6 +27,16 @@ Route::get('/deposit/simulation', function (Request $request) {
     dd($response);
 });
 
+Route::get('test-email', function () {
+    $email = "ndamjoh@gmail.com";
+
+    $code = rand(100000, 999999);
+    \Illuminate\Support\Facades\Notification::route('mail', $email)
+        ->notify(new \App\Notifications\EmailVerificationToken($code));
+
+    return "Email sent";
+});
+
 Route::prefix('webhook/response')->group(function () {
     Route::post('/providus', [ProvidusController::class, 'webhook']);
     Route::post('/nijapay', [NijaPayController::class, 'webhook']);

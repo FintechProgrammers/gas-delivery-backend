@@ -21,8 +21,8 @@ class VendorController extends Controller
         $longitude = $validated->longitude;
         $search = $request->query('search'); // Retrieve search query if provided
 
-        // $vendor = $this->getNearbyVendors($latitude, $longitude, $search);
-        $vendor = \App\Models\User::where('is_business', true)->get();
+        $vendor = $this->getNearbyVendors($latitude, $longitude, $search);
+        // $vendor = \App\Models\User::where('is_business', true)->get();
 
         $vendor = VendorResource::collection($vendor);
 
