@@ -54,7 +54,7 @@
                             <th>Vendor</th>
                             <th>Rider</th>
                             <th>Amount</th>
-                            <th>Payment</th>
+                            {{-- <th>Payment</th> --}}
                             <th>Status</th>
                             <th>Date</th>
                             <th></th>

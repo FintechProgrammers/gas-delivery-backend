@@ -28,13 +28,13 @@
                 <p class="mb-0 fw-semibold">{{ number_format($item->total_amount, 2) }} NGN</p>
             </div>
         </td>
-        <td>
+        {{-- <td>
             @if ($item->is_paid)
                 <span class="badge bg-success">Paid</span>
             @else
                 <span class="badge bg-warning">Pending</span>
             @endif
-        </td>
+        </td> --}}
         <td>
             @if ($item->status === 'pending')
                 <span class="badge bg-transparent border border-warning text-warning">Pending</span>
