@@ -67,6 +67,10 @@ class RegisterController extends Controller
             // // sent Onboarding
             // dispatch(new VerifyEmailJob($mailData));
 
+            // $code = $this->generateUserOtp($user->id, "email_verification");
+
+            // $user->notify(new \App\Notifications\EmailVerificationToken($code));
+
             $token = $user->createToken('auth_token')->accessToken;
 
             $user = new UserResource($user);

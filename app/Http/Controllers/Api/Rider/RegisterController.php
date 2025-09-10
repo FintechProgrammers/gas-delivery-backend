@@ -53,9 +53,13 @@ class RegisterController extends Controller
 
             $token = $user->createToken('auth_token')->accessToken;
 
-            $otp = $this->generatePhoneToken($request->phone_number);
+            $code = $this->generateUserOtp($user->id, "email_verification");
 
-            PhoneNumberTokenJob::dispatch($request->phone_number, $otp);
+            $user->notify(new \App\Notifications\EmailVerificationToken($code));
+
+            // $otp = $this->generatePhoneToken($request->phone_number);
+
+            // PhoneNumberTokenJob::dispatch($request->phone_number, $otp);
 
             $user = new UserResource($user);
 

@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
 use App\Http\Controllers\Api\WalletController;
@@ -73,6 +74,11 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(VerifyPhoneNumberController::class)->prefix('phone-number')->group(function () {
         Route::post('/token/request', 'requestToken');
         Route::post('/verify', 'verifyPhoneNumber');
+    });
+
+    Route::controller(VerifyEmailController::class)->prefix('email')->group(function () {
+        Route::post('/send/verification', 'sendVerificationEmail');
+        Route::post('/verify', 'verifyEmail');
     });
 
     Route::prefix('push')->group(function () {

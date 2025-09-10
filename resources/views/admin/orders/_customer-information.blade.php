@@ -5,11 +5,11 @@
                 <h4 class="card-title">Customer Information</h4>
             </div><!--end col-->
             <div class="col-auto">
-                @if ($order->is_paid)
+                {{-- @if ($order->is_paid)
                     <span class="badge rounded text-success bg-success-subtle fs-12 p-1">Paid</span>
                 @else
                     <span class="badge rounded text-warning bg-warning-subtle fs-12 p-1">Payment pending</span>
-                @endif
+                @endif --}}
             </div><!--end col-->
         </div> <!--end row-->
     </div><!--end card-header-->
