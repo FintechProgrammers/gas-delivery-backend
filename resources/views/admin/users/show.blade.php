@@ -106,6 +106,7 @@
 
                         spinner.hide()
                         buttonTest.show()
+                        button.attr('disabled', false)
 
                         setTimeout(function() {
                             displayMessage(response.message, "success")

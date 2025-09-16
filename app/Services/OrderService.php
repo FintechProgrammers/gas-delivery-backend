@@ -6,6 +6,7 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderResource;
 use App\Models\DeliveryAddress;
 use App\Models\GasOrder;
+use App\Models\Revenue;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Transaction;
@@ -40,64 +41,84 @@ class OrderService
             $user = $order->user;
             $rider = $order->rider;
             $vendor = $order->business;
+            $riderAmount = 0;
+            $vendorAmount = 0;
+            $totalAmount = $order->total_amount;
 
             // Calculate the expected amounts for the rider and vendor
-            $riderAmount = $order->delivery_fee;
-            $vendorAmount = $order->gas_amount;
+            $deliveryAmount = $order->delivery_fee;
 
-            // Debit the user's wallet
-            $user->wallet->update([
-                'balance' => $user->wallet->balance - $order->total_amount,
-            ]);
+            if ($order->payment_method === 'WALLET') {
+                // Debit the user's wallet
+                $user->wallet->update([
+                    'balance' => $user->wallet->balance - $order->total_amount,
+                ]);
 
-            // Credit the rider's wallet
-            $rider->wallet->update([
-                'balance' => $rider->wallet->balance + $riderAmount,
-            ]);
+                // Create transaction history for the user (debit)
+                $this->transactionService->createTransaction(
+                    $user,
+                    $order->total_amount,
+                    'purchase',
+                    'debit',
+                    'completed',
+                    'TX' . uniqid(),
+                    $user->wallet->balance,
+                    $user->wallet->balance - $order->total_amount,
+                    'Payment for order #' . $order->id
+                );
+            }
 
-            // Credit the vendor's wallet
-            $vendor->wallet->update([
-                'balance' => $vendor->wallet->balance + $vendorAmount,
-            ]);
+            //get rider percentage from settings
+            $riderPercentage = systemSettings()->rider_percentage ?? 0;
+            if ($riderPercentage > 0) {
 
-            // Create transaction history for the user (debit)
-            $this->transactionService->createTransaction(
-                $user,
-                $order->total_amount,
-                'purchase',
-                'debit',
-                'completed',
-                'TX' . uniqid(),
-                $user->wallet->balance,
-                $user->wallet->balance - $order->total_amount,
-                'Payment for order #' . $order->id
-            );
+                $riderCut = ($riderPercentage / 100) * $deliveryAmount;
+                $riderAmount = $riderCut;
 
-            // Create transaction history for the rider (credit)
-            $this->transactionService->createTransaction(
-                $rider,
-                $riderAmount,
-                'deposit',
-                'credit',
-                'completed',
-                'TX' . uniqid(),
-                $rider->wallet->balance,
-                $rider->wallet->balance + $riderAmount,
-                'Earnings from order #' . $order->id
-            );
+                $rider->wallet->update([
+                    'balance' => $rider->wallet->balance + $riderAmount,
+                ]);
 
-            // Create transaction history for the vendor (credit)
-            $this->transactionService->createTransaction(
-                $vendor,
-                $vendorAmount,
-                'deposit',
-                'credit',
-                'completed',
-                'TX' . uniqid(),
-                $vendor->wallet->balance,
-                $vendor->wallet->balance + $vendorAmount,
-                'Earnings from order #' . $order->id
-            );
+                // Create transaction history for the rider (credit)
+                $this->transactionService->createTransaction(
+                    $rider,
+                    $riderAmount,
+                    'deposit',
+                    'credit',
+                    'completed',
+                    'TX' . uniqid(),
+                    $rider->wallet->balance,
+                    $rider->wallet->balance + $riderAmount,
+                    'Earnings from order #' . $order->id
+                );
+            }
+
+            //get amount too take from  vendor from the vendor account
+            $vendorFee = $vendor->vendor_fee ?? 0;
+
+            if ($vendorFee > 0) {
+                $gasAmount =  $order->gas_amount;
+
+                $vendorAmount = $gasAmount - $vendorFee;
+
+                // Credit the vendor's wallet
+                $vendor->wallet->update([
+                    'balance' => $vendor->wallet->balance + $vendorAmount,
+                ]);
+
+                // Create transaction history for the vendor (credit)
+                $this->transactionService->createTransaction(
+                    $vendor,
+                    $vendorAmount,
+                    'deposit',
+                    'credit',
+                    'completed',
+                    'TX' . uniqid(),
+                    $vendor->wallet->balance,
+                    $vendor->wallet->balance + $vendorAmount,
+                    'Earnings from order #' . $order->id
+                );
+            }
 
             // ✅ Check if referral is active and user has a parent
             $settings = Setting::first();
@@ -127,8 +148,21 @@ class OrderService
                         $newBalance,
                         'Referral bonus from order #' . $order->reference
                     );
+
+                    $riderAmount = $riderAmount - $referralBonus;
                 }
             }
+
+            //record platform earnings
+            $platformEarnings = $totalAmount - ($riderAmount + $vendorAmount);
+
+            Revenue::create([
+                'order_id' => $order->id,
+                'amount' => $platformEarnings,
+                'rider_amount' => $riderAmount,
+                'vendor_amount' => $vendorAmount,
+                'referral_amount' => $referralBonus,
+            ]);
 
             DB::commit();
 
@@ -206,12 +240,23 @@ class OrderService
             $distance = round($distance, 2);
 
             // Calculate delivery fee and gas amount
-            $deliveryFee = $deliveryFee = calculateDeliveryFee($distance);
+            $deliveryFee = calculateDeliveryFee($distance);
 
             $pricePerKg = $business->pricePerKg->price;
             $gasAmount = $pricePerKg * $requestData['gas_amount'];
 
             $totalAmount = $gasAmount + $deliveryFee;
+
+            if ($requestData['payment_method'] === 'WALLET') {
+                // Check if the user has sufficient balance
+                if ($wallet->balance < $totalAmount) {
+                    return [
+                        'success' => false,
+                        'message' => 'Insufficient balance',
+                        'status' => 400,
+                    ];
+                }
+            }
 
             // Check if the user has sufficient balance
             if ($wallet->balance < $totalAmount) {
@@ -237,6 +282,7 @@ class OrderService
                 'gas_size' => $requestData['gas_amount'] . 'kg',
                 'cylinder_size' => $requestData['cylinder_size'] . 'kg',
                 'price_per_km' => 0,
+                'payment_method' => $requestData['payment_method'],
             ]);
 
             DB::commit();

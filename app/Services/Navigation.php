@@ -52,6 +52,12 @@ class Navigation
                 'hasPermission' => true
             ],
             (object) [
+                'name'  => 'Revenue',
+                'route' => 'admin.revenue.index',
+                'icon'  => 'iconoir-wallet',
+                'hasPermission' => true
+            ],
+            (object) [
                 'name'      => 'Supports',
                 'icon'      => 'las la-headset',
                 'routes'    => ['admin.support.subjects.index', 'admin.support.tickets.index'],

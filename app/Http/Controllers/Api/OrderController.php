@@ -8,12 +8,8 @@ use App\Http\Requests\OrderRequest;
 use App\Http\Requests\RequestRider;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderResource;
-use App\Http\Resources\UserResource;
-use App\Models\DeliveryAddress;
-use App\Models\GasPricing;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
-use App\Models\Transaction;
 use App\Models\User;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -49,6 +45,17 @@ class OrderController extends Controller
         $fee = calculateDeliveryFee($request->distance);
 
         return $this->sendResponse(['delivery_fee' => $fee], 'Delivery fee calculated');
+    }
+
+    public function markAsPaid(GasOrder $order)
+    {
+        if ($order->is_paid) {
+            return $this->sendError("Order is already marked as paid", [], Response::HTTP_NOT_ACCEPTABLE);
+        }
+
+        $order->update(['is_paid' => true]);
+
+        return $this->sendResponse([], "Order marked as paid successfully", Response::HTTP_OK);
     }
 
     /**

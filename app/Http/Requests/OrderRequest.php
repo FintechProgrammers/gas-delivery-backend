@@ -29,6 +29,7 @@ class OrderRequest extends FormRequest
             'delivery_address' => ['required'],
             'cylinder_size' => ['required', 'numeric'],
             'gas_amount' => ['required', 'numeric'],
+            'payment_method' => ['required', 'in:WALLET,CARD,CASH'],
         ];
     }
 

@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProviderController;
+use App\Http\Controllers\Admin\RevenueController;
 use App\Http\Controllers\Admin\RiderController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -51,8 +52,8 @@ Route::middleware('admin.auth')->group(function () {
         Route::post('/suspend/{user}', 'suspend')->name('suspend');
         Route::post('/activate/{user}', 'activate')->name('activate');
         Route::post('/delete/{user}', 'destroy')->name('delete');
+        Route::post('/fee/update/{user}', 'updateFee')->name('update-vendor-fee');
     });
-
 
     Route::controller(CustomerController::class)->prefix('customer')->name('customer.')->group(function () {
         Route::get('', 'index')->name('index');
@@ -161,6 +162,11 @@ Route::middleware('admin.auth')->group(function () {
         Route::get('/provider/{provider}', 'details')->name('details');
         Route::post('/update/{provider}', 'update')->name('update');
         Route::post('/toggle-feature/{provider}', 'toggleFeature')->name('toggle.feature');
+    });
+
+    Route::controller(RevenueController::class)->prefix('revenue')->name('revenue.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
     });
 });
 

@@ -25,6 +25,7 @@ class OrderResource extends JsonResource
             'gas_amount' => $this->gas_amount,
             'total_amount' => $this->total_amount,
             'distance' => $this->distance,
+            'payment_method' => $this->payment_method,
             'is_paid' => (bool)$this->is_paid,
             'status' => $this->status,
             'vendor_address' => $this->to_distination,

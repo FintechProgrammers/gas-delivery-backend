@@ -448,3 +448,15 @@ if (!function_exists('formatAsNGN')) {
         return ($isMonetary ? '₦' : '') . number_format($absValue, $isMonetary ? 2 : 0);
     }
 }
+
+//payments methods
+if (!function_exists('paymentMethods')) {
+    function paymentMethods()
+    {
+        return [
+            'WALLET' => 'Wallet',
+            'CARD' => 'Card',
+            'CASH' => 'Cash on Delivery',
+        ];
+    }
+}

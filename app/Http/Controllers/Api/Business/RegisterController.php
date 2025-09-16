@@ -41,7 +41,7 @@ class RegisterController extends Controller
             $user = User::create([
                 'business_name' => $validated->business_name,
                 // 'email'  => $validated->email,
-                'phone_number' => $validated->phone_number,
+                'phone_number' => formatPhoneNumber($validated->phone_number),
                 'is_business' => true,
                 'account_type' => 'BUSINESS',
                 'phone_number_verified_at' => now(),

@@ -39,7 +39,7 @@ class RegisterController extends Controller
                 'last_name' => $validated->last_name,
                 'date_of_birth' => $validated->date_of_birth,
                 'email'  => $validated->email,
-                'phone_number' => $validated->phone_number,
+                'phone_number' => formatPhoneNumber($validated->phone_number),
                 'password' => Hash::make($validated->password),
                 'date_of_birth' => $validated->date_of_birth,
                 'is_business' => false,

@@ -138,6 +138,56 @@
             </div>
         </div>
 
+        {{-- Payment Methods --}}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <h6><b>{{ __('Payment Methods Settings') }}</b></h6>
+
+                    <div class="col-12 mb-3">
+                        <label class="form-label">Select Payment Methods</label>
+                        @php
+                            $availableMethods = paymentMethods();
+                            $selectedMethods = systemSettings()?->payment_methods ?? [];
+                        @endphp
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach ($availableMethods as $key => $label)
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="payment_methods[]"
+                                        value="{{ $key }}" id="payment_method_{{ $key }}"
+                                        {{ in_array($key, $selectedMethods) ? 'checked' : '' }}>
+                                    <label class="form-check-label"
+                                        for="payment_method_{{ $key }}">{{ $label }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                        <small class="text-muted">Toggle to enable/disable payment methods.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Rider Percentage --}}
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <h6><b>{{ __('Rider Settings') }}</b></h6>
+
+                    {{-- Rider Percentage --}}
+                    <div class="col-lg-4 mb-3">
+                        <label for="rider_percentage">{{ __('Rider Percentage (%)') }}</label>
+                        <div class="input-group">
+                            <input type="number" min="0" max="100" step="0.01" name="rider_percentage"
+                                class="form-control" id="rider_percentage"
+                                value="{{ systemSettings()?->rider_percentage ?? 0 }}" aria-describedby="rider-addon">
+                            <span class="input-group-text" id="rider-addon">%</span>
+                        </div>
+                        <small class="text-muted">Set the percentage of each order that goes to the rider.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <div class="">

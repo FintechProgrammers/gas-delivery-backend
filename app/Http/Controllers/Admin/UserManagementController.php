@@ -169,4 +169,27 @@ class UserManagementController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Deleted successfully.']);
     }
+
+    function updateFee(Request $request, User $user)
+    {
+        $request->validate([
+            'vendor_fee' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user->update([
+                'vendor_fee' => $request->vendor_fee,
+            ]);
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Vendor fee updated successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger($e);
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
+    }
 }

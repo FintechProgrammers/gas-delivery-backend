@@ -33,18 +33,36 @@ class OrderRequestController extends Controller
     public function acceptOrder(Request $request, GasOrder $order)
     {
         try {
-            // Ensure there is an associated gas order
+            DB::beginTransaction();
+
+            // Lock the row to prevent race condition
+            $order = GasOrder::where('id', $order->id)->lockForUpdate()->first();
+
+            //check if order is already assigned to another rider
+            if ($order->rider_id) {
+                DB::rollBack();
+                return $this->sendError("Order has already been assigned to another rider", [], Response::HTTP_CONFLICT);
+            }
 
             $rider = $request->user();
-
             $user = $order->user;
 
-            DB::beginTransaction();
+            //make sure the rider does not have any active orders
+            // $activeOrder = GasOrder::where('rider_id', $rider->id)
+            //     ->whereIn('status', ['pending', 'active'])
+            //     ->first();
+
+            // if ($activeOrder) {
+            //     DB::rollBack();
+            //     return $this->sendError("You have an active order. Please complete it before accepting another.", [], Response::HTTP_CONFLICT);
+            // }
 
             // Update the OrderRider and the associated GasOrder
             $order->update(['rider_id' => $rider->id]);
 
-            OrderRider::where('order_id', $order->id)->where('rider_id', $rider->id)->update(['status' => 'accepted']);
+            OrderRider::where('order_id', $order->id)
+                ->where('rider_id', $rider->id)
+                ->update(['status' => 'accepted']);
 
             $rider->update([
                 'is_available' => false
@@ -65,6 +83,7 @@ class OrderRequestController extends Controller
             return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public function rejectOrder(Request $request, GasOrder $order)
     {
@@ -215,6 +234,24 @@ class OrderRequestController extends Controller
         }
 
         return $this->sendResponse($timelineData);
+    }
+
+    public function markAsPaid(GasOrder $order)
+    {
+        try {
+            DB::beginTransaction();
+
+            $order->update(['is_paid' => true]);
+
+            DB::commit();
+
+            return $this->sendResponse([], "Order marked as paid", Response::HTTP_OK);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger()->error("Failed to mark order as paid: " . $e->getMessage(), ['exception' => $e]);
+
+            return $this->sendError(serviceDownMessage(), [], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     function getTimelineStatus()

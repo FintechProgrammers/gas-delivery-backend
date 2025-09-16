@@ -24,7 +24,13 @@ class LoginController extends Controller
 
             $validated = $request->validated();
 
-            $user = User::where('phone_number', formatPhoneNumber($validated['phone_number']))->where('is_business', false)->first();
+            $login = $validated['login'];
+            // Check if login is an email
+            if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+                $user = User::where('email', $login)->where('account_type', 'CUSTOMER')->first();
+            } else {
+                $user = User::where('phone_number', formatPhoneNumber($login))->where('account_type', 'CUSTOMER')->first();
+            }
 
             if (!$user || !Hash::check($validated['password'], $user->password)) {
                 return $this->sendError("Invalid login credentials", [], 404);

@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
 use App\Http\Controllers\Api\Rider\OrderRequestController;
 use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
+use App\Http\Controllers\Api\SettingsController as ApiSettingsController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
@@ -125,6 +126,7 @@ Route::middleware(['auth:api'])->group(function () {
         Route::post('/cancel/{order}', 'cancelOrder');
         Route::post('/complete/{order}', 'complete');
         Route::get('/timeline/{order}', 'getOrderTimeline');
+        Route::post('/mark-as-paid/{order}', 'markAsPaid');
     });
 
     Route::prefix('business')->group(function () {
@@ -158,6 +160,7 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('/timeline/update/{order}', 'updateStatus');
             Route::get('/timeline/{order}', 'getOrderTimeline');
             Route::get('/milestones', 'getTimelineStatus');
+            Route::post('/mark-as-paid/{order}', 'markAsPaid');
         });
 
         Route::controller(SettingsController::class)->prefix('settings')->group(function () {

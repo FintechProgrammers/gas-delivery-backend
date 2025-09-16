@@ -3,9 +3,11 @@
 use App\Http\Controllers\NijaPayController;
 use App\Http\Controllers\ProvidusController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    dd(Hash::make("test1234"));
     return view('welcome');
 });
 

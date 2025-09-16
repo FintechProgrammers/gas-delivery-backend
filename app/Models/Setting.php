@@ -13,5 +13,6 @@ class Setting extends Model
 
     protected $casts = [
         'tiered_rates' => 'array',
+        'payment_methods' => 'array',
     ];
 }
