@@ -100,7 +100,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
         Route::get('', 'index');
         Route::patch('', 'update');
-        Route::patch('/update/photo', 'updateProfilePhoto');
+        Route::post('/update/photo', 'updateProfilePhoto');
         Route::patch('/business/update', 'updateBusinessProfile');
         Route::post('/password/update', 'updatePassword');
     });

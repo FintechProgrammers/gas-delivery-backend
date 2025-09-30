@@ -80,7 +80,7 @@ class ProfileController extends Controller
     function updateProfilePhoto(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'image' => 'required|image|max:2048',
+            'image_url' => 'required',
         ]);
 
         // Handle validation errors
@@ -92,14 +92,14 @@ class ProfileController extends Controller
             $user = $request->user();
 
             // Check if there's an existing file and delete it
-            if ($user->profile_image) {
-                deleteFile($user->profile_image);
-            }
+            // if ($user->profile_image) {
+            //     deleteFile($user->profile_image);
+            // }
 
-            $image = uploadFile($request->file('image'), "uploads/profile", "do_spaces");
+            // $image = uploadFile($request->file('image'), "uploads/profile", "do_spaces");
 
             $user->update([
-                'profile_image'  => $image
+                'profile_image'  => $request->image_url
             ]);
 
             return $this->sendResponse([], "Profile updated successfully", 201);
