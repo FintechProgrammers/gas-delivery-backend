@@ -288,7 +288,7 @@ if (!function_exists('formatPhoneNumber')) {
 if (!function_exists('maxDistance')) {
     function maxDistance()
     {
-        return 30;
+        return 400;
     }
 }
 
