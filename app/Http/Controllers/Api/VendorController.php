@@ -76,9 +76,9 @@ class VendorController extends Controller
             $user = \App\Models\User::whereId($item->user_id)->where('is_business', true)->where('vendor_fee', '>', 0)->first();
             if ($user) { // Check if the user is not null
                 $user->distance = $item->distance;
+                return $user;
             }
-            return $user;
-        });
+        })->filter();
 
         return $nearbyBusinesses;
     }
