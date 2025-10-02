@@ -47,18 +47,28 @@ class VendorController extends Controller
         $maxDistance = maxDistance();
 
         $query = DB::table('user_infos')
-            ->join('users', 'user_infos.user_id', '=', 'users.id') // Join users table
+            ->join('users', 'user_infos.user_id', '=', 'users.id')
+            ->whereNotNull('user_infos.latitude')
+            ->whereNotNull('user_infos.longitude')
+            ->where('users.status', 'active')
             ->select(
                 'user_infos.*',  // Select all business details
                 'users.uuid as uuid',
                 'users.*',
-                DB::raw("(6371 * acos(cos(radians($latitude))
-                * cos(radians(latitude))
-                * cos(radians(longitude) - radians($longitude))
-                + sin(radians($latitude))
-                * sin(radians(latitude)))) AS distance") // Calculate distance
+                DB::raw("(
+                    6371 * acos(
+                        LEAST(1, GREATEST(-1, 
+                            cos(radians({$latitude})) *
+                            cos(radians(CAST(user_infos.latitude AS DECIMAL(10,8)))) *
+                            cos(radians(CAST(user_infos.longitude AS DECIMAL(11,8))) - radians({$longitude})) +
+                            sin(radians({$latitude})) *
+                            sin(radians(CAST(user_infos.latitude AS DECIMAL(10,8))))
+                        ))
+                    )
+                ) AS distance")
             )
-            ->where('users.status', 'active'); // Only select active business information
+            ->havingRaw('distance < ? AND distance IS NOT NULL', [$maxDistance])
+            ->orderBy('distance', 'asc');
 
         // Add a condition to search by business_name
         if ($search) {
