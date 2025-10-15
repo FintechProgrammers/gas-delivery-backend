@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\AssignRiderToOrder;
+use App\Models\GasOrder;
 use Illuminate\Console\Command;
 
 class SearchAvailableRider extends Command
@@ -25,6 +27,11 @@ class SearchAvailableRider extends Command
      */
     public function handle()
     {
-        //
+        //get all pending orders 
+        $orders = GasOrder::where('status', 'pending')->get();
+
+        foreach ($orders as $order) {
+            dispatch(new AssignRiderToOrder($order));
+        }
     }
 }
