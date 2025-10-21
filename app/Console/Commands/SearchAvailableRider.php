@@ -31,7 +31,7 @@ class SearchAvailableRider extends Command
         $orders = GasOrder::where('status', 'pending')->get();
 
         foreach ($orders as $order) {
-            dispatch(new AssignRiderToOrder($order));
+            // dispatch(new AssignRiderToOrder($order));
         }
     }
 }
