@@ -38,7 +38,7 @@ class RiderRejectedOrder implements ShouldBroadcast
     {
         // Broadcast to a private channel specific to the user who made the order
         return [
-            new Channel('order.rejected.' . $this->user->id),
+            new Channel('order.rejected.' . $this->user->uuid),
         ];
     }
 

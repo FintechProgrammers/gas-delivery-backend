@@ -85,7 +85,6 @@ class OrderRequestController extends Controller
         }
     }
 
-
     public function rejectOrder(Request $request, GasOrder $order)
     {
         try {
