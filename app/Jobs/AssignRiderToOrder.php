@@ -29,10 +29,15 @@ class AssignRiderToOrder implements ShouldQueue
      */
     public function handle(): void
     {
+
+        logger("in the search");
+
         // If the order is already accepted by a rider, do not notify again
         $alreadyAccepted = OrderRider::where('order_id', $this->order->id)
             ->where('status', 'accepted')
             ->exists();
+
+        logger("here");
 
         if ($alreadyAccepted) {
             return;
