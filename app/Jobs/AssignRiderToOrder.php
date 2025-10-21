@@ -29,6 +29,7 @@ class AssignRiderToOrder implements ShouldQueue
      */
     public function handle(): void
     {
+        logger("here");
         // If the order is already accepted by a rider, do not notify again
         $alreadyAccepted = OrderRider::where('order_id', $this->order->id)
             ->where('status', 'accepted')
@@ -44,6 +45,8 @@ class AssignRiderToOrder implements ShouldQueue
             ->orderBy('created_at', 'desc')
             ->first();
 
+        logger("assignment");
+
         if ($pendingAssignment && $pendingAssignment->created_at->diffInSeconds(now()) > 60) {
             // Mark the previous assignment as cancelled or rejected
             $pendingAssignment->update(['status' => 'rejected']);
@@ -51,6 +54,8 @@ class AssignRiderToOrder implements ShouldQueue
             // If still within a minute, do not reassign
             return;
         }
+
+        logger("getting riders");
 
         // Get the nearest available riders who have NOT rejected this order
         $riders = getNearbyAvailableRiders($this->order->delivery_latitude, $this->order->delivery_longitude);
