@@ -9,6 +9,7 @@ use App\Events\TripStarted;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderOrderResource;
+use App\Jobs\AssignRiderToOrder;
 use App\Models\GasOrder;
 use App\Models\OrderRider;
 use App\Models\OrderTimeline;
@@ -105,6 +106,8 @@ class OrderRequestController extends Controller
 
             // Trigger the event
             event(new RiderRejectedOrder($user, $order, $rider));
+
+            dispatch(new AssignRiderToOrder($order));
 
             DB::commit();
 

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\RiderResource;
+use App\Jobs\AssignRiderToOrder;
 use App\Models\DeliveryAddress;
 use App\Models\GasOrder;
 use App\Models\Revenue;
@@ -286,6 +287,8 @@ class OrderService
             ]);
 
             DB::commit();
+
+            dispatch(new AssignRiderToOrder($order));
 
             // Fetch nearby available riders
             $availableRiders = getNearbyAvailableRiders($deliveryAddress->latitude, $deliveryAddress->longitude);
