@@ -17,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@master
         with:
           php-version: 8.2
-          extensions: mbstring, ctype, fileinfo, openssl, PDO, bcmath, json, tokenizer, xml, gmp, curl, bcmath
+          extensions: mbstring, ctype, fileinfo, openssl, PDO, bcmath, json, tokenizer, xml, gmp, curl, bcmath, php-dom
       - name: Composer install
         run: |
           composer install --no-dev --no-interaction --prefer-dist
@@ -28,7 +28,7 @@ jobs:
         run: tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git *
 
       - name: Store artifact for distribution
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-build
           path: ${{ github.sha }}.tar.gz
@@ -50,7 +50,7 @@ jobs:
       matrix:
         server: ${{ fromJson(needs.create-deployment-artifacts.outputs.DEPLOYMENT_MATRIX) }}
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: app-build
       - name: Upload
@@ -127,7 +127,7 @@ jobs:
           ACTIVE_RELEASE_PATH: ${{ matrix.server.path }}/current
           STORAGE_PATH: ${{ matrix.server.path }}/storage
           BASE_PATH: ${{ matrix.server.path }}
-          STAGE_ENV: ${{ secrets.STAGE_ENV }}
+          STAGE_ENV: ${{ env.STAGE_ENV }}
         with:
           host: ${{ matrix.server.ip }}
           username: ${{ matrix.server.username }}
@@ -135,7 +135,7 @@ jobs:
           port: ${{ matrix.server.port }}
           envs: GITHUB_SHA,RELEASE_PATH,ACTIVE_RELEASE_PATH,STORAGE_PATH,BASE_PATH,ENV_PATH,STAGE_ENV
           script: |
-            printf "%s" "$STAGE_ENV" > "${BASE_PATH}/.env"
+            #printf "%s" "$STAGE_ENV" > "${BASE_PATH}/.env"
             ln -s -f ${BASE_PATH}/.env $RELEASE_PATH
             ln -s -f $STORAGE_PATH $RELEASE_PATH
             ln -s -n -f $RELEASE_PATH $ACTIVE_RELEASE_PATH

@@ -31,13 +31,14 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request)
     {
         try {
+
             $user =  $request->user();
 
             $user->update([
                 'phone_number' => $request->phone_number,
             ]);
 
-            $user->userProfile->update([
+            $user->profile->update([
                 'country_code'  => $request->country,
                 'address'       => $request->address,
                 'city'          => $request->city,
@@ -100,6 +101,36 @@ class ProfileController extends Controller
             ]);
 
             return response()->json(['success' => true, 'message' => 'Password updated successfully']);
+        } catch (\Exception $e) {
+            logger($e);
+
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
+    }
+
+    function updateLocation(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'longitude' => 'required',
+            'latitude' => 'required',
+            'address' => 'nullable'
+        ]);
+
+        // Handle validation errors
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $user = $request->user();
+
+            $user->profile->update([
+                'longitude' => $request->longitude,
+                'latitude' => $request->latitude,
+                'address' => $request->address
+            ]);
+
+            return $this->sendResponse([], 'Location updated successfully.');
         } catch (\Exception $e) {
             logger($e);
 

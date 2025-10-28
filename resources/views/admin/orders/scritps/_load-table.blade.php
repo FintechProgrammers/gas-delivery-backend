@@ -49,7 +49,7 @@
             },
             beforeSend: function() {
                 table.html(`<tr>
-                            <td class="text-center" colspan="6">
+                            <td class="text-center" colspan="9">
                                 <div class="d-flex justify-content-center">
                                     <div class="spinner-border" role="status">
                                         <span class="sr-only">Loading...</span>

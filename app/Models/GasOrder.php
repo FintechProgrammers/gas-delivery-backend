@@ -29,4 +29,40 @@ class GasOrder extends Model
     {
         return $this->belongsTo(User::class, 'business_id', 'id');
     }
+
+    function rider()
+    {
+        return $this->belongsTo(User::class, 'rider_id', 'id');
+    }
+
+    function deliveryAddress()
+    {
+        return $this->hasOne(DeliveryAddress::class, 'id', 'delivery_address_id');
+    }
+
+    public function timeline()
+    {
+        return $this->hasMany(OrderTimeline::class, 'order_id', 'id');
+    }
+
+    /**
+     * Define the route model binding key for a given model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'from_distination' => 'array',
+            'to_distination' => 'array'
+        ];
+    }
 }

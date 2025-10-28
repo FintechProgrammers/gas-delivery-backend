@@ -25,12 +25,9 @@ class DeliveryAddressRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'country' => ['required', 'exists:countries,id'],
-            'state'   => ['required', 'string'],
-            'city'  => ['required', 'string'],
-            'house_number' => ['required', 'string'],
-            'street' => ['required', 'string'],
-            'nearest_land_mark' => ['required', 'string'],
+            'address' => ['required', 'string'],
+            'longitude' => ['required', 'string'],
+            'latitude' => ['required', 'string'],
         ];
     }
 

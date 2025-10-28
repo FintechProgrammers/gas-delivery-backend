@@ -10,6 +10,7 @@ use App\Notifications\VeryPhoneNumber;
 use App\Traits\RecursiveActions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Twilio\Rest\Client;
 
 class RegisterController extends Controller
@@ -19,7 +20,17 @@ class RegisterController extends Controller
     function __invoke(RegisterRequest $request)
     {
         try {
+
             $validated = $request->validated();
+
+            // check if user is already registered with same email and phone numbet
+            if (User::where('email', $validated['email'])->exists()) {
+                return $this->sendError("Email address already taken", [], 422);
+            }
+
+            if (User::where('phone_number', $validated['phone_number'])->exists()) {
+                return $this->sendError("Phone number address already taken", [], 422);
+            }
 
             DB::beginTransaction();
 
@@ -39,16 +50,21 @@ class RegisterController extends Controller
                 'first_name'    => $validated['first_name'],
                 'last_name'     => $validated['last_name'],
                 'email'         => $validated['email'],
+                'password' => Hash::make($validated['password']),
                 'phone_number'  => formatPhoneNumber($validated['phone_number']),
-                'date_of_birth' => $validated['date_of_birth'],
+                'date_of_birth' => ($request->filled('date_of_birth')) ? $validated['date_of_birth'] : null,
                 'parent_id'     => $parent,
                 'is_business'   => false,
                 'account_type' => 'CUSTOMER',
             ]);
 
-            $code = $this->generateUserOtp($user->id, "phone_number_verification");
+            // $code = $this->generateUserOtp($user->id, "phone_number_verification");
 
-            $user->notify(new VeryPhoneNumber($code));
+            // $user->notify(new VeryPhoneNumber($code));
+
+            $code = $this->generateUserOtp($user->id, "email_verification");
+
+            $user->notify(new \App\Notifications\EmailVerificationToken($code));
 
             $token = $user->createToken('authToken')->accessToken;
 

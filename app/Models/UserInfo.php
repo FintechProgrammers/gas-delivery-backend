@@ -15,6 +15,7 @@ class UserInfo extends Model
     {
         return [
             'opening_days' => 'array',
+            'vehical_details' => 'array'
         ];
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
+// use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
@@ -64,11 +65,13 @@ class User extends Authenticatable
             $user->referral_code = static::generateReferralCode();
         });
 
-        // static::created(function ($user) {
-        //     if ($user->is_business) {
-        //         BusinessInfo::create(['user_id' => $user->id]);
-        //     }
-        // });
+        static::created(function ($user) {
+            if ($user->is_business) {
+                BusinessInfo::create(['user_id' => $user->id]);
+            }
+
+            Wallet::create(['user_id' => $user->id]);
+        });
     }
 
     function profile()
@@ -102,7 +105,7 @@ class User extends Authenticatable
         }
 
         // Check fields in UserInfo model
-        $userInfo = $this->userProfile;
+        $userInfo = $this->profile;
         if ($userInfo) {
             foreach ($this->userInfoRequiredFields as $field) {
                 if (!empty($userInfo->$field)) {
@@ -135,9 +138,19 @@ class User extends Authenticatable
         return $this->hasMany(UserActivities::class, 'user_id', 'id')->latest();
     }
 
+    function deliveryAddress()
+    {
+        return $this->hasOne(DeliveryAddress::class, 'user_id', 'id');
+    }
+
     function bankAccounts()
     {
         return $this->hasMany(BankAccount::class, 'user_id')->latest();
+    }
+
+    function depositAccount()
+    {
+        return $this->hasOne(DepositAccount::class);
     }
 
     /**
@@ -157,6 +170,16 @@ class User extends Authenticatable
         return $this->phone_number;
     }
 
+    function rides()
+    {
+        return $this->hasMany(GasOrder::class, 'rider_id', 'id')->where('status', 'completes');
+    }
+
+    function totalRides()
+    {
+        return $this->rides()->count();
+    }
+
     function pricing()
     {
         return $this->hasMany(GasPricing::class, 'business_id', 'id')->latest();
@@ -165,6 +188,48 @@ class User extends Authenticatable
     function pricePerKg()
     {
         return $this->hasOne(PricePerKg::class, 'user_id', 'id');
+    }
+
+    public function ratings()
+    {
+        return $this->hasMany(Rating::class, 'user_id');
+    }
+
+    public function givenRatings()
+    {
+        return $this->hasMany(Rating::class, 'rated_by');
+    }
+
+    // Accessor for 5-star rating percentage
+    public function getStarRatingAttribute()
+    {
+        $totalRatings = $this->ratings()->count();
+        if ($totalRatings === 0) {
+            return 0; // Avoid division by zero
+        }
+
+        $fiveStarRatings = $this->five_star_rating_count;
+        return round(($fiveStarRatings / $totalRatings) * 100, 2);
+    }
+
+    function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'user_id', 'id')->latest();
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(User::class, 'parent_id');
+    }
+
+    public function userKycs()
+    {
+        return $this->hasMany(UserKyc::class, 'user_id', 'id');
+    }
+
+    public function getCacIsVerifiedAttribute()
+    {
+        return $this->userKycs()->where('service', 'cac')->where('status', 'approved')->exists();
     }
 
     /**

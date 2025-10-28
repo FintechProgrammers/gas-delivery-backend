@@ -16,9 +16,9 @@ class GasPricingController extends Controller
     {
         $user = $request->user();
 
-        $gasPrice = GasPricing::where('business_id', $user->id)->get();
+        $gasPrice = GasPricing::where('business_id', $user->id)->first();
 
-        $gasPrice =  GasPriceResource::collection($gasPrice);
+        $gasPrice = new  GasPriceResource($gasPrice);
 
         return $this->sendResponse($gasPrice);
     }
@@ -64,7 +64,7 @@ class GasPricingController extends Controller
 
             $user = $request->user();
 
-            PricePerKg::updateOrCreate(['user_id' => $user->id, 'price' => $request->price_per_kg]);
+            PricePerKg::updateOrCreate(['user_id' => $user->id], ['price' => $request->price_per_kg]);
 
             return $this->sendResponse([], "Price per Kg set successfully", 201);
         } catch (\Exception $e) {

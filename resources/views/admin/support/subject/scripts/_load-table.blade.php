@@ -8,7 +8,7 @@
         const table = $('#table-body')
 
         $.ajax({
-            url: '/admin/support/subjects/filter',
+            url: "{{ route('admin.support.subjects.filter') }}",
             type: 'GET',
             beforeSend: function() {
                 table.html(`<tr>

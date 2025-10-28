@@ -23,38 +23,38 @@ class RegisterController extends Controller
     {
         $validated = (object) $request->validated();
 
+        if (!empty($request->email) && User::where('email', $request->email)->exists()) {
+            return $this->sendError("Email address already taken", [], 422);
+        }
+
+        if (User::where('business_name', $request->business_name)->exists()) {
+            return $this->sendError("Business name already exists. Please choose a different name.", [], 422);
+        }
+
+        if (User::where('phone_number', $validated->phone_number)->exists()) {
+            return $this->sendError("Phone number already taken", [], 422);
+        }
+
         try {
             DB::beginTransaction();
 
-            // validate phone number otp
-            $phoneToken = PhoneVerificationCode::where('token', $validated->token)
-                ->where('phone_number', $validated->phone_number)
-                ->where('created_at', '>', now()->subSeconds(3600))
-                ->first();
-
-            if (!$phoneToken) {
-                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            }
-
-            $photoUrl = null;
-
-            if ($request->hasFile('photo')) {
-                $photoUrl = uploadFile($request->file('photo'), 'users', 'do_spaces');
-            }
-
             $user = User::create([
                 'business_name' => $validated->business_name,
-                'email'  => $validated->email,
-                'phone_number' => $validated->phone_number,
-                'password' => Hash::make($validated->password),
+                // 'email'  => $validated->email,
+                'phone_number' => formatPhoneNumber($validated->phone_number),
                 'is_business' => true,
                 'account_type' => 'BUSINESS',
                 'phone_number_verified_at' => now(),
-                'profile_image' => $photoUrl
+                'profile_image' => $request->photo
             ]);
 
             UserInfo::create([
                 'user_id' => $user->id,
+                'address' => $request->address,
+                'longitude' => $request->longitude,
+                'latitude' => $request->latitude,
+                'dpr_number' => $request->dpr_number,
+                'business_type' => $request->business_type
             ]);
 
             // $mailData = [
@@ -67,6 +67,10 @@ class RegisterController extends Controller
             // // sent Onboarding
             // dispatch(new VerifyEmailJob($mailData));
 
+            // $code = $this->generateUserOtp($user->id, "email_verification");
+
+            // $user->notify(new \App\Notifications\EmailVerificationToken($code));
+
             $token = $user->createToken('auth_token')->accessToken;
 
             $user = new UserResource($user);
@@ -75,8 +79,6 @@ class RegisterController extends Controller
                 'user' => $user,
                 'token' => $token,
             ];
-
-            $phoneToken->delete();
 
             DB::commit();
 

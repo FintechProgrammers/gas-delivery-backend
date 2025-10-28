@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class RiderResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->uuid,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'email' => $this->email,
+            'account_type' => $this->account_type,
+            'referral_code' => $this->referral_code,
+            'date_of_birth' => $this->date_of_birth,
+            'phone_number' => $this->phone_number,
+            'profile_image' => $this->profile_picture,
+            'phone_number_verified' => (bool) !empty($this->phone_number_verified_at) ? true : false,
+            'email_verified'       => (bool) !empty($this->email_verified_at) ? true : false,
+            'status'               => $this->status,
+            'is_available'         => (bool) $this->is_available,
+            'vehicle_details' => optional($this->profile)->vehical_details,
+            'location' => [
+                'longitude' => optional($this->profile)->latitude,
+                'latitude' => optional($this->profile)->longitude
+            ],
+            'total_rides' => $this->totalRides(),
+            'distance' => $this->when(isset($this->profile->distance), round($this->profile->distance, 2)), // Include distance if calculated
+            'created_at' => $this->created_at
+        ];
+    }
+}

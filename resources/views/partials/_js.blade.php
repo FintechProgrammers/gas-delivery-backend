@@ -1,17 +1,13 @@
-<script src="https://code.jquery.com/jquery-3.6.1.min.js"
-    integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
 <!-- Popper JS -->
-<script src="{{ asset('assets/libs/@popperjs/core/umd/popper.min.js') }}"></script>
 
-<!-- Bootstrap JS -->
 <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
-
-<script src="{{ asset('assets/libs/vue.min.js') }}"></script>
-
-<script src="{{ asset('assets/libs/axios.min.js') }}"></script>
-
+<script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}"></script>
 <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
+{{-- <script src="{{ asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script> --}}
+{{-- <script src="{{ asset('assets/libs/jsvectormap/js/jsvectormap.min.js') }}"></script> --}}
+{{-- <script src="{{ asset('assets/js/pages/index.init.js') }}"></script> --}}
+<script src="{{ asset('assets/js/app.js') }}"></script>
 
 @include('partials.scripts._copy-scripts')
 

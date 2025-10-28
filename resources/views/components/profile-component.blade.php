@@ -1,7 +1,7 @@
-<div class="d-flex align-items-center lh-1">
+<div class="d-flex align-items-center">
     <div class="me-2">
-        <span class="avatar avatar-md avatar-rounded">
-            <img src="{{ $image }}" alt="">
+        <span class="rounded-circle thumb-md me-1 d-inline">
+            <img src="{{ $image }}" alt="" width="45px" height="45px">
         </span>
     </div>
     <div>

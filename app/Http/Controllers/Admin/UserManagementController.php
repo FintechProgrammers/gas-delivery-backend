@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\GasOrder;
 use App\Models\User;
 use App\Models\UserInfo;
 use Carbon\Carbon;
@@ -28,17 +30,19 @@ class UserManagementController extends Controller
 
         $search = $request->filled('search') ? $request->search : null;
         $status = $request->filled('status')  ? $request->status : null;
-        $accountType = $request->filled('account_type') ? $request->account_type : null;
 
-        $query = User::withTrashed();
+        $query = User::where('is_business', true)->withTrashed();
 
         $query = $query
-            ->when(!empty($search), fn ($query) => $query->where('name', 'LIKE', "%{$search}%")->orWhere('email', 'LIKE', "%{$search}%")->orWhere('username', 'LIKE', "%{$search}%"))
-            ->when(!empty($status), fn ($query) => $query->where('status', $status))
-            ->when(!empty($accountType), fn ($query) => $accountType == 'business' ? $query->where('is_business', true) : $query->where('is_business', false))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn ($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($accountType) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $accountType == 'business' ? $query->where('is_business', true)->whereBetween('created_at', [$dateFrom, $dateTo]) : $query->where('is_business', false)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(
+                !empty($search),
+                fn($query) => $query->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+            )
+            ->when(!empty($status), fn($query) => $query->where('status', $status))
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
+            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['users'] = $query->paginate(50);
 
@@ -91,13 +95,53 @@ class UserManagementController extends Controller
 
     function show(User $user)
     {
+
+        // Prepare data for the view
         $data['user'] = $user;
+
+        if ($user->account_type === 'RIDER') {
+
+            // Calculate total projects (completed rides)
+            $totalProjects = $user->rides()->where('status', 'completed')->count();
+
+            // Calculate success rate
+            $totalRides = GasOrder::count();
+            $successRate = $totalRides > 0 ? round(($totalProjects / $totalRides) * 100, 2) : 0;
+
+            // Calculate total earnings
+            $totalEarnings = $user->transactions()->where('status', 'completed')->where('action', 'deposit')->sum('amount');
+
+            $data['totalProjects'] = $totalProjects;
+            $data['successRate'] = $successRate;
+            $data['totalEarnings'] = $totalEarnings;
+        }
 
         return view('admin.users.show', $data);
     }
 
-    function update(Request $request)
+    function update(UpdateUserRequest $request, User $user)
     {
+        try {
+            $user->update([
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+            ]);
+
+            $user->userProfile->update([
+                'country_code'  => $request->country,
+                'address'       => $request->address,
+                'city'          => $request->city,
+                'state'         => $request->state,
+                'date_of_birth' => $request->date_of_birth,
+                'zip_code'      => $request->zip_code,
+            ]);
+
+            return $this->sendResponse([], "User profile updated successfully.");
+        } catch (\Exception $e) {
+            logger($e);
+
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
     }
 
     function suspend(User $user)
@@ -124,5 +168,28 @@ class UserManagementController extends Controller
         $user->delete();
 
         return response()->json(['success' => true, 'message' => 'Deleted successfully.']);
+    }
+
+    function updateFee(Request $request, User $user)
+    {
+        $request->validate([
+            'vendor_fee' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $user->update([
+                'vendor_fee' => $request->vendor_fee,
+            ]);
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Vendor fee updated successfully.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            logger($e);
+            return response()->json(['success' => false, 'message' => serviceDownMessage()], 500);
+        }
     }
 }

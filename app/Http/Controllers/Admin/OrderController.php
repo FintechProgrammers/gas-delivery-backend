@@ -25,13 +25,20 @@ class OrderController extends Controller
 
         $query = GasOrder::withTrashed();
 
-        $query->when(!empty($search), fn ($query) => $query->where('reference', 'LIKE', "%{$search}%"))
-            ->when(!empty($status), fn ($query) => $query->where('status', $status))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn ($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn ($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
+        $query->when(!empty($search), fn($query) => $query->where('reference', 'LIKE', "%{$search}%"))
+            ->when(!empty($status), fn($query) => $query->where('status', $status))
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
+            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['orders'] = $query->paginate(50);
 
         return view('admin.orders._table', $data);
+    }
+
+    function show(GasOrder $order)
+    {
+        $data['order'] = $order;
+
+        return view('admin.orders.show', $data);
     }
 }

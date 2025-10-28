@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Users')
+@section('title', 'Vendor')
 
 @push('styles')
 @endpush
@@ -8,7 +8,7 @@
 @section('content')
     <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
         <div>
-            <p class="fw-semibold fs-18 mb-0">User Management</p>
+            <p class="fw-semibold fs-18 mb-0">Vendor Management</p>
         </div>
         {{-- <div class="btn-list mt-md-0 mt-2">
             <button type="button" class="btn btn-primary btn-wave trigerModal" data-url="{{ route('admin.users.create') }}"
@@ -24,14 +24,6 @@
                     <label for="searchInputSearch">Search</label>
                     <input type="search" class="form-control" placeholder="Search by email,name and account type"
                         id="search" aria-describedby="emailHelp">
-                </div>
-                <div class="col-lg-2 mb-lg-0 mb-4">
-                    <label for="searchInputSearch">Account Type</label>
-                    <select class="form-control" id="account_type">
-                        <option value="">--select--</option>
-                        <option value="customer">Customer</option>
-                        <option value="business">Business</option>
-                    </select>
                 </div>
                 <div class="col-lg-2 mb-lg-0 mb-4">
                     <label for="searchInputSearch">Status</label>
@@ -62,7 +54,6 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th class="text-center">Account Type</th>
                         <th>Date Join</th>
                         <th>Status</th>
                         <th width="10">Action</th>

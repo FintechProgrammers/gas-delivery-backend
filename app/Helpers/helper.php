@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\Settings;
+use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -259,7 +260,7 @@ if (!function_exists('limitWords')) {
 if (!function_exists('systemSettings')) {
     function systemSettings()
     {
-        return Settings::first();
+        return Setting::first();
     }
 }
 
@@ -281,5 +282,181 @@ if (!function_exists('formatPhoneNumber')) {
         }
 
         return $phoneNumber;
+    }
+}
+
+if (!function_exists('maxDistance')) {
+    function maxDistance()
+    {
+        return 400;
+    }
+}
+
+if (!function_exists('calculateDistance')) {
+    function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
+    {
+        $earthRadius = 6371; // Earth radius in kilometers
+
+        $latFrom = deg2rad($latitudeFrom);
+        $lonFrom = deg2rad($longitudeFrom);
+        $latTo = deg2rad($latitudeTo);
+        $lonTo = deg2rad($longitudeTo);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
+            cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
+
+        return $angle * $earthRadius;
+    }
+}
+
+if (!function_exists('pricePerKm')) {
+    function pricePerKm()
+    {
+        return 100;
+    }
+}
+
+if (!function_exists('calculateDeliveryFee')) {
+    function calculateDeliveryFee(float $distance): float
+    {
+        $settings = \App\Models\Setting::first();
+
+        if (!$settings) return 0;
+
+        if ($settings->delivery_rate_type === 'per_km') {
+            return ($settings->price_per_km ?? 0) * $distance;
+        }
+
+        if ($settings->delivery_rate_type === 'tiered') {
+            foreach ($settings->tiered_rates ?? [] as $tier) {
+                if ($distance >= $tier['min'] && $distance <= $tier['max']) {
+                    return $tier['price'];
+                }
+            }
+        }
+
+        return 0; // fallback
+    }
+}
+
+
+// if (!function_exists('getNearbyAvailableRiders')) {
+//     function
+//     getNearbyAvailableRiders($latitude, $longitude)
+//     {
+//         // Get nearby riders nearby locations from user_infos
+//         $riders = \App\Models\User::where('is_business', false)
+//             ->where('is_available', true)
+//             ->where('account_type', 'RIDER')
+//             ->whereHas('profile', function ($query) use ($latitude, $longitude) {
+//                 $query->select('id', 'user_id', 'latitude', 'longitude')
+//                     ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+//                     ->having('distance', '<', maxDistance());
+//             })
+//             ->get();
+
+//         return $riders;
+//     }
+// }
+
+if (!function_exists('getNearbyAvailableRiders')) {
+    function getNearbyAvailableRiders($latitude, $longitude)
+    {
+        // Get nearby riders nearby locations from user_infos
+        $riders = \App\Models\User::where('is_business', false)
+            ->where('is_available', true)
+            ->where('account_type', 'RIDER')
+            ->whereHas('profile', function ($query) use ($latitude, $longitude) {
+                $query->select('id', 'user_id', 'latitude', 'longitude')
+                    ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+                    ->having('distance', '<', maxDistance());
+            })
+            ->with(['profile' => function ($query) use ($latitude, $longitude) {
+                $query->select('id', 'user_id', 'latitude', 'longitude')
+                    ->selectRaw('( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS distance', [$latitude, $longitude, $latitude]);
+            }])
+            ->get();
+
+        return $riders;
+    }
+}
+
+
+if (!function_exists('milestones')) {
+    function milestones()
+    {
+        return [
+            'trip_started' => [
+                'label' => 'Trip Started',
+                'description' => 'The trip has been initiated by the rider.',
+            ],
+            'arrive_station' => [
+                'label' => 'Arrive Station',
+                'description' => 'The rider has arrived at the gas station.',
+            ],
+            'rider_returning' => [
+                'label' => 'Rider Returning',
+                'description' => 'The rider is returning after refueling.',
+            ],
+            'order_complete' => [
+                'label' => 'Order Complete',
+                'description' => 'The order has been successfully completed.',
+            ],
+        ];
+    }
+}
+
+if (!function_exists('sendPushNotification')) {
+    function sendPushNotification(User $user, $message, $title, $data = [])
+    {
+        if (!empty($user->user_push_id)) {
+            $notificationService = new \App\Services\PushNotification();
+
+            $notificationService->sendNotificationToOne($message, $title, $user->user_push_id);
+        }
+    }
+}
+if (!function_exists('formatAsNGN')) {
+    function formatNumber($value, $isMonetary = false)
+    {
+        // Handle null or zero values
+        if (is_null($value) || $value == 0) {
+            return $isMonetary ? '₦0' : '0';
+        }
+
+        // Convert to absolute value for formatting
+        $absValue = abs($value);
+
+        if ($absValue >= 1_000_000_000) {
+            // Billions (B)
+            $formatted = number_format($absValue / 1_000_000_000, 2) + 0; // Remove trailing zeros
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'B';
+        } elseif ($absValue >= 1_000_000) {
+            // Millions (M)
+            $formatted = number_format($absValue / 1_000_000, 2) + 0;
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'M';
+        } elseif ($absValue >= 10_000) {
+            // Thousands (k)
+            $formatted = number_format($absValue / 1_000, 2) + 0;
+            return ($isMonetary ? '₦' : '') . rtrim($formatted, '.0') . 'k';
+        }
+
+        // Less than 10,000, format as is
+        return ($isMonetary ? '₦' : '') . number_format($absValue, $isMonetary ? 2 : 0);
+    }
+}
+
+//payments methods
+if (!function_exists('paymentMethods')) {
+    function paymentMethods()
+    {
+        return [
+            'WALLET' => 'Wallet',
+            'CARD' => 'Card',
+            'CASH' => 'Cash on Delivery',
+        ];
     }
 }

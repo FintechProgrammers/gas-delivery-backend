@@ -1,19 +1,37 @@
 <?php
 
 use App\Http\Controllers\AccountVerificationController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Api\BookmarkBusinessController;
 use App\Http\Controllers\Api\Business\GasPricingController;
 use App\Http\Controllers\Api\Business\LoginController as BusinessLoginController;
+use App\Http\Controllers\Api\Business\OrderController as BusinessOrderController;
 use App\Http\Controllers\Api\Business\RegisterController as BusinessRegisterController;
 use App\Http\Controllers\Api\Business\SettingsController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\DeliveryAddressController;
 use App\Http\Controllers\Api\GasPriceController;
+use App\Http\Controllers\Api\KycController;
 use App\Http\Controllers\Api\LoginController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\RatingController;
+use App\Http\Controllers\Api\RecoverPasswordController;
 use App\Http\Controllers\Api\RegisterController;
+use App\Http\Controllers\Api\Rider\LoginController as RiderLoginController;
+use App\Http\Controllers\Api\Rider\OrderRequestController;
+use App\Http\Controllers\Api\Rider\RegisterController as RiderRegisterController;
+use App\Http\Controllers\Api\SettingsController as ApiSettingsController;
+use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\TransactionPinController;
 use App\Http\Controllers\Api\VendorController;
+use App\Http\Controllers\Api\VerifyEmailController;
 use App\Http\Controllers\Api\VerifyPhoneNumberController;
 use App\Http\Controllers\Api\VerifyPhoneVerificationController;
+use App\Http\Controllers\Api\WalletController;
+use App\Http\Controllers\ProfileController as ControllersProfileController;
+use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,18 +39,35 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', RegisterController::class);
     Route::post('/login', LoginController::class);
 
+    Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
+    Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
+
+    Route::controller(RecoverPasswordController::class)->prefix('password')->group(function () {
+        Route::post('/forgot', 'forgotPassword');
+        Route::post('/reset', 'resetPassword');
+    });
+
     Route::prefix('business')->group(function () {
         Route::controller(VerifyPhoneVerificationController::class)->prefix('phone')->group(function () {
             Route::post('token/request', 'requestCode');
             Route::post('verify', 'verifyCode');
         });
 
+        Route::post('/password/set', [ProfileController::class, 'setPassword'])->middleware('auth:api');
+
         Route::post('/register', BusinessRegisterController::class);
         Route::post('/login', BusinessLoginController::class);
     });
 
-    Route::post('/validate/token', [VerifyPhoneNumberController::class, 'validateToken'])->middleware('auth:api');
-    Route::post('/send/token', [VerifyPhoneNumberController::class, 'resentLoginToken'])->middleware('auth:api');
+    Route::prefix('rider')->group(function () {
+        Route::controller(VerifyPhoneVerificationController::class)->prefix('phone')->group(function () {
+            Route::post('token/request', 'requestCode');
+            Route::post('verify', 'verifyCode');
+        });
+
+        Route::post('/register', RiderRegisterController::class);
+        Route::post('/login', RiderLoginController::class);
+    });
 });
 
 Route::middleware(['auth:api'])->group(function () {
@@ -40,6 +75,18 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(VerifyPhoneNumberController::class)->prefix('phone-number')->group(function () {
         Route::post('/token/request', 'requestToken');
         Route::post('/verify', 'verifyPhoneNumber');
+    });
+
+    Route::controller(VerifyEmailController::class)->prefix('email')->group(function () {
+        Route::post('/send/verification', 'sendVerificationEmail');
+        Route::post('/verify', 'verifyEmail');
+    });
+
+    Route::prefix('push')->group(function () {
+        Route::controller(PushNotificationController::class)->group(function () {
+            Route::post('/subscribe', 'userSubscribed');
+            Route::post('/unsubscribe', 'userUnSubscribed');
+        });
     });
 
     Route::controller(DeliveryAddressController::class)->prefix('delivery/address')->group(function () {
@@ -53,8 +100,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::controller(ProfileController::class)->prefix('profile')->group(function () {
         Route::get('', 'index');
         Route::patch('', 'update');
-        Route::patch('/update/photo', 'updateProfilePhoto');
+        Route::post('/update/photo', 'updateProfilePhoto');
         Route::patch('/business/update', 'updateBusinessProfile');
+        Route::post('/password/update', 'updatePassword');
     });
 
     Route::prefix('gas')->group(function () {
@@ -66,6 +114,19 @@ Route::middleware(['auth:api'])->group(function () {
             Route::get('/', 'index');
             Route::get('/{user}', 'show');
         });
+    });
+
+    Route::controller(OrderController::class)->prefix('orders')->group(function () {
+        Route::get('', 'index');
+        Route::post('', 'placeOrder');
+        Route::post('/estimate-delivery', 'estimateDelivery');
+        Route::get('/show/{order}', 'orderDetails');
+        Route::post('/rider/request', 'requestRider');
+        Route::get('riders/{order}', 'getNearbyRiders');
+        Route::post('/cancel/{order}', 'cancelOrder');
+        Route::post('/complete/{order}', 'complete');
+        Route::get('/timeline/{order}', 'getOrderTimeline');
+        Route::post('/mark-as-paid/{order}', 'markAsPaid');
     });
 
     Route::prefix('business')->group(function () {
@@ -81,11 +142,85 @@ Route::middleware(['auth:api'])->group(function () {
             Route::post('opening/days', 'openingDays');
             Route::post('availability', 'toggleAvailability');
         });
+
+        Route::controller(BusinessOrderController::class)->prefix('orders')->group(function () {
+            Route::get('', 'index');
+        });
     });
+
+    Route::prefix('rider')->group(function () {
+        Route::post('/update', [ProfileController::class, 'updateRider']);
+
+        Route::controller(OrderRequestController::class)->prefix('orders')->group(function () {
+            Route::get('', 'index');
+            Route::post('/accept/{order}', 'acceptOrder');
+            Route::post('/reject/{order}', 'rejectOrder');
+            Route::post('/start/{order}', 'startTripe');
+            Route::post('/complete/{order}', 'completeTripe');
+            Route::post('/timeline/update/{order}', 'updateStatus');
+            Route::get('/timeline/{order}', 'getOrderTimeline');
+            Route::get('/milestones', 'getTimelineStatus');
+            Route::post('/mark-as-paid/{order}', 'markAsPaid');
+        });
+
+        Route::controller(SettingsController::class)->prefix('settings')->group(function () {
+            Route::post('availability', 'toggleAvailability');
+        });
+
+        Route::post('/location/update', [ControllersProfileController::class, 'updateLocation']);
+    });
+
+    Route::controller(TransactionPinController::class)->prefix('transaction/pin')->group(function () {
+        Route::post('set', 'setTransactionPin');
+        Route::post('update', 'updateTransactionPin');
+        Route::post('reset/token', 'requestResetToken');
+        Route::post('reset', 'resetTransactionPin');
+    });
+
+    Route::post('/riders/rate/{userId}', [RatingController::class, 'store']);
+    Route::get('/riders/ratings/{userId}', [RatingController::class, 'show']);
 
     Route::controller(AccountVerificationController::class)->prefix('account')->group(function () {
         Route::post('/email/verify', 'verifyEmail');
         Route::post('/email/token', 'sentEmailToken');
+    });
+
+    Route::controller(TransactionController::class)->prefix('transactions')->group(function () {
+        Route::get('', 'index');
+        Route::get('/{transaction}', 'show');
+    });
+
+    Route::controller(KycController::class)->prefix('kyc/verify')->group(function () {
+        Route::post('/nin', 'verifyNIN');
+        Route::post('/driver-license', 'verifyDriverLicence');
+    });
+
+    Route::controller(WalletController::class)->prefix('wallet')->group(function () {
+        Route::get('', 'index');
+        Route::get('/fund', 'fundWallet');
+        Route::post('/withdraw', 'withdraw');
+        Route::get('/banks', 'getBanks');
+        Route::post('/account/lookup', 'accountLookup');
+        Route::post('/bank/account/create', 'addAccount');
+        Route::get('/bank/account', 'bankAccounts');
+        Route::delete('/bank/account/delete/{account}', 'deleteBankAccount');
+    });
+
+    Route::controller(VerificationController::class)->prefix('verification')->group(function () {
+        Route::post('nin', 'verifyNin');
+        Route::post('bvn', 'verifyBnv');
+        Route::post('licence', 'verifyDriversLicence');
+        Route::post('cac', 'verifyCAC');
+    });
+
+    Route::controller(BookmarkBusinessController::class)->prefix('vendor/bookmark')->group(function () {
+        Route::get('/', 'index');
+        Route::post('/create', 'create');
+        Route::delete('/remove/{bookmark}', 'removeBusiness');
+    });
+
+    Route::controller(AdminSettingsController::class)->prefix('settings')->group(function () {
+        Route::get('/', 'getSettings');
     });
 });
 

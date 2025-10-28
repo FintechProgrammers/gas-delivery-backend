@@ -1,9 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-nav-layout="vertical" data-theme-mode="light" data-header-styles="light"
-    data-menu-styles="dark" data-toggled="close">
+<html lang="en" dir="ltr" data-startbar="dark" data-bs-theme="light">
 
 <head>
-
     <!-- Meta Data -->
     @include('partials._meta')
 
@@ -14,19 +12,16 @@
 </head>
 
 <body>
-    {{-- @include('partials._switcher') --}}
-    @include('partials._loader')
-    <div class="page">
-        @include('partials.headers')
-        @include('partials._sidebar')
-
-        <div class="main-content app-content">
+    @include('partials.headers')
+    @include('partials._sidebar')
+    <div class="startbar-overlay d-print-none"></div>
+    <div class="page-wrapper">
+        <div class="page-content">
             <div class="container-fluid">
                 @yield('content')
             </div>
         </div>
     </div>
-
 
     @include('partials._modal')
 

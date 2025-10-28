@@ -5,19 +5,25 @@ use App\Http\Controllers\Admin\Auth\AdminForgotPasswordController;
 use App\Http\Controllers\Admin\Auth\AdminResetPasswordController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DeliveryController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProviderController;
+use App\Http\Controllers\Admin\RevenueController;
+use App\Http\Controllers\Admin\RiderController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\SupportController;
+use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserManagementController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('admin.guest')->group(function () {
-    Route::get('', [LoginController::class, 'index'])->name('login');
-    Route::post('', [LoginController::class, 'login'])->name('login.post');
+    Route::get('/', [LoginController::class, 'index'])->name('login');
+    Route::post('/', [LoginController::class, 'login'])->name('login.post');
 
     Route::controller(AdminForgotPasswordController::class)->prefix('forgot-password')->name('forgot.password.')->group(function () {
         Route::get('', 'index')->name('index');
@@ -33,6 +39,8 @@ Route::middleware('admin.guest')->group(function () {
 Route::middleware('admin.auth')->group(function () {
     Route::controller(DashboardController::class)->prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('', 'index')->name('index');
+        Route::get('revenue-overview', 'revenueOverview')->name('stats.revenue');
+        Route::get('stats/customers', 'customerGrowth')->name('stats.customers');
     });
 
     Route::controller(UserManagementController::class)->prefix('users')->name('users.')->group(function () {
@@ -44,6 +52,17 @@ Route::middleware('admin.auth')->group(function () {
         Route::post('/suspend/{user}', 'suspend')->name('suspend');
         Route::post('/activate/{user}', 'activate')->name('activate');
         Route::post('/delete/{user}', 'destroy')->name('delete');
+        Route::post('/fee/update/{user}', 'updateFee')->name('update-vendor-fee');
+    });
+
+    Route::controller(CustomerController::class)->prefix('customer')->name('customer.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
+    });
+
+    Route::controller(RiderController::class)->prefix('rider')->name('rider.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('/filter', 'filter')->name('filter');
     });
 
     Route::controller(AdministrativeUserController::class)->prefix('admins')->name('admins.')->group(function () {
@@ -116,13 +135,39 @@ Route::middleware('admin.auth')->group(function () {
 
     Route::controller(DeliveryController::class)->prefix('delivery')->name('delivery.')->group(function () {
         Route::get('index', 'index')->name('index');
-        Route::get('filter', 'filter')->name('filter');
     });
 
     Route::controller(OrderController::class)->prefix('order')->name('order.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/filter', 'filter')->name('filter');
+        Route::get('/show/{order}', 'show')->name('show');
+    });
+
+    Route::controller(TransactionController::class)->prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+        Route::get('show/{order}', 'show')->name('show');
     });
 
     Route::get('update-countries', [CountryController::class, 'updateCountriesTableWithFlags']);
+
+    Route::controller(SettingsController::class)->prefix('settings')->name('settings.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('store', 'store')->name('store');
+    });
+
+    Route::controller(ProviderController::class)->prefix('providers')->name('providers.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+        Route::get('/provider/{provider}', 'details')->name('details');
+        Route::post('/update/{provider}', 'update')->name('update');
+        Route::post('/toggle-feature/{provider}', 'toggleFeature')->name('toggle.feature');
+    });
+
+    Route::controller(RevenueController::class)->prefix('revenue')->name('revenue.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::get('filter', 'filter')->name('filter');
+    });
 });
+
+Route::get('/get-banks', [SettingsController::class, 'getBanks']);
