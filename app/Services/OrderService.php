@@ -288,7 +288,7 @@ class OrderService
 
             DB::commit();
 
-            dispatch(new AssignRiderToOrder($order));
+            dispatch(new AssignRiderToOrder($order))->afterCommit();
 
             // Fetch nearby available riders
             $availableRiders = getNearbyAvailableRiders($deliveryAddress->latitude, $deliveryAddress->longitude);

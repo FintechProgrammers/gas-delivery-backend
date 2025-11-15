@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class AssignRiderToOrder implements ShouldQueue
+class AssignRiderToOrder
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
