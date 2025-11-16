@@ -10,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class AssignRiderToOrder
+class AssignRiderToOrder implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -27,7 +27,7 @@ class AssignRiderToOrder
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle()
     {
 
         logger("in the search");
@@ -40,6 +40,7 @@ class AssignRiderToOrder
         logger("here");
 
         if ($alreadyAccepted) {
+            logger("order already accepted", ['order_id' => $this->order->id]);
             return;
         }
 
@@ -50,15 +51,22 @@ class AssignRiderToOrder
             ->first();
 
         if ($pendingAssignment && $pendingAssignment->created_at->diffInSeconds(now()) > 60) {
+            logger("previous assignment expired", ['order_id' => $this->order->id]);
             // Mark the previous assignment as cancelled or rejected
             $pendingAssignment->update(['status' => 'rejected']);
         } elseif ($pendingAssignment) {
             // If still within a minute, do not reassign
+            logger("previous assignment still valid", ['order_id' => $this->order->id]);
             return;
         }
 
-        // Get the nearest available riders who have NOT rejected this order
-        $riders = getNearbyAvailableRiders($this->order->delivery_latitude, $this->order->delivery_longitude);
+        $from = json_decode($this->order->to_distination, true);
+
+        $lat = $from['latitude'];
+        $lng = $from['longitude'];
+
+        $riders = getNearbyAvailableRiders($lat, $lng);
+
         $eligibleRider = $riders->first(function ($rider) {
             return !OrderRider::where('order_id', $this->order->id)
                 ->where('rider_id', $rider->id)
@@ -66,11 +74,14 @@ class AssignRiderToOrder
                 ->exists();
         });
 
+        logger("eligible rider found", ['rider_id' => $eligibleRider->id, 'order_id' => $this->order->id]);
+
         if ($eligibleRider) {
             OrderRider::updateOrCreate(
                 ['rider_id' => $eligibleRider->id, 'order_id' => $this->order->id],
                 ['status' => 'pending']
             );
+
             broadcast(new \App\Events\DriverRquest($eligibleRider, $this->order));
         }
     }

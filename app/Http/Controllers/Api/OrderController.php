@@ -66,6 +66,7 @@ class OrderController extends Controller
      */
     public function placeOrder(OrderRequest $request)
     {
+
         $user = $request->user();
 
         $requestData = $request->validated();

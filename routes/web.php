@@ -39,6 +39,17 @@ Route::get('test-email', function () {
     return "Email sent";
 });
 
+// Route::get('test-rider-request', function () {
+
+//     $order = \App\Models\GasOrder::whereUuid('7f62db2d-38ea-44d3-8882-d8e4ebc76319')->first();
+
+//     $handler = new \App\Jobs\AssignRiderToOrder($order);
+
+//     $handler->handle();
+
+//     dd("done");
+// });
+
 Route::prefix('webhook/response')->group(function () {
     Route::post('/providus', [ProvidusController::class, 'webhook']);
     Route::post('/nijapay', [NijaPayController::class, 'webhook']);
