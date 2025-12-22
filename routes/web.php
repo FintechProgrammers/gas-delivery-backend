@@ -50,6 +50,19 @@ Route::get('test-email', function () {
 //     dd("done");
 // });
 
+Route::get('test-sms', function () {
+    $bulkSms = new \App\Services\BulkSms();
+
+    $data = [
+        'to' => '2349167615132',
+        'message' => 'This is a test message from FaastGas.',
+    ];
+
+    $response = $bulkSms->sendSms($data);
+
+    dd($response);
+});
+
 Route::prefix('webhook/response')->group(function () {
     Route::post('/providus', [ProvidusController::class, 'webhook']);
     Route::post('/nijapay', [NijaPayController::class, 'webhook']);

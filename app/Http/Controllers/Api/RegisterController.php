@@ -58,13 +58,16 @@ class RegisterController extends Controller
                 'account_type' => 'CUSTOMER',
             ]);
 
-            // $code = $this->generateUserOtp($user->id, "phone_number_verification");
+            $code = $this->generateUserOtp($user->id, "phone_number_verification");
 
             // $user->notify(new VeryPhoneNumber($code));
 
-            $code = $this->generateUserOtp($user->id, "email_verification");
+            // $code = $this->generateUserOtp($user->id, "email_verification");
 
-            $user->notify(new \App\Notifications\EmailVerificationToken($code));
+            // $user->notify(new \App\Notifications\EmailVerificationToken($code));
+
+            dispatch(new \App\Jobs\PhoneNumberVerificationToken($code, $user->phone_number))->afterCommit();
+
 
             $token = $user->createToken('authToken')->accessToken;
 

@@ -25,7 +25,8 @@ class VerifyPhoneNumberController extends Controller
 
             $code = $this->generateUserOtp($user->id, "phone_number_verification");
 
-            $user->notify(new VeryPhoneNumber($code));
+            // $user->notify(new VeryPhoneNumber($code));
+            dispatch(new \App\Jobs\PhoneNumberVerificationToken($code, $user->phone_number))->delay(now()->addSeconds(10));
 
             return $this->sendResponse([], "Verification token sent successfully.");
         } catch (\Exception $e) {
@@ -46,15 +47,15 @@ class VerifyPhoneNumberController extends Controller
             $user = $request->user();
 
             // get the verification token
-            // $token = UserOtp::where('token', $validated->token)
-            //     ->where('user_id', $user->id)
-            //     ->where('purpose', 'phone_number_verification')
-            //     ->where('created_at', '>', now()->subSeconds(3600))
-            //     ->first();
+            $token = UserOtp::where('token', $validated->token)
+                ->where('user_id', $user->id)
+                ->where('purpose', 'phone_number_verification')
+                ->where('created_at', '>', now()->subSeconds(3600))
+                ->first();
 
-            // if (!$token) {
-            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            // }
+            if (!$token) {
+                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
+            }
 
             if (!empty($user->phone_number_verified_at)) {
                 return $this->sendError('Your phone number is already verified', Response::HTTP_UNPROCESSABLE_ENTITY);

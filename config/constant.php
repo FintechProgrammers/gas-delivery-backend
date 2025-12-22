@@ -23,4 +23,10 @@ return  [
         'api_key' => env('VERIFY_ME_API_KEY'),
         'secret' => env('VERIFY_ME_SECRET'),
     ],
+    'bulksms' => [
+        'base_url' => env('BULK_SMS_BASE_URL'),
+        'api_key' => env('BULK_SMS_API_KEY'),
+        'default_sender' => env('BULK_SMS_DEFAULT_SENDER', 'FaastGas'),
+        'timeout' => env('BULK_SMS_TIMEOUT', 30),
+    ]
 ];
