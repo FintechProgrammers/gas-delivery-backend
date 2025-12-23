@@ -36,6 +36,19 @@ class PhoneNumberVerificationToken implements ShouldQueue
     public function __construct(string $token, string $phoneNumber)
     {
         $this->token = $token;
+
+        // Remove + sign if present
+        $phoneNumber = str_replace('+', '', $phoneNumber);
+
+        // Ensure number starts with 234 (Nigerian country code)
+        if (str_starts_with($phoneNumber, '0')) {
+            // Convert 0xxx to 234xxx
+            $phoneNumber = '234' . substr($phoneNumber, 1);
+        } elseif (!str_starts_with($phoneNumber, '234')) {
+            // If it doesn't start with 234 or 0, prepend 234
+            $phoneNumber = '234' . $phoneNumber;
+        }
+
         $this->phoneNumber = $phoneNumber;
     }
 
