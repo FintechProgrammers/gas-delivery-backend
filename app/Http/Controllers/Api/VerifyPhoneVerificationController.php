@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\PhoneNumberTokenJob;
+use App\Jobs\PhoneNumberVerificationToken;
 use App\Models\PhoneVerificationCode;
 use App\Models\User;
 use App\Traits\RecursiveActions;
@@ -35,7 +36,7 @@ class VerifyPhoneVerificationController extends Controller
 
             $token = $this->generatePhoneToken($request->phone_number);
 
-            PhoneNumberTokenJob::dispatch($request->phone_number, $token);
+            PhoneNumberVerificationToken::dispatch($token, $request->phone_number);
 
             return $this->sendResponse([], "Phone number verification code send successful", Response::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -61,18 +62,18 @@ class VerifyPhoneVerificationController extends Controller
                 return $this->sendError("Phone number already taken", [], 422);
             }
 
-            // $token = PhoneVerificationCode::where('token', $request->token)
-            //     ->where('phone_number', $request->phone_number)
-            //     ->where('created_at', '>', now()->subSeconds(3600))
-            //     ->first();
+            $token = PhoneVerificationCode::where('token', $request->token)
+                ->where('phone_number', $request->phone_number)
+                ->where('created_at', '>', now()->subSeconds(3600))
+                ->first();
 
-            // if (!$token) {
-            //     return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
-            // }
+            if (!$token) {
+                return $this->sendError('Invalid token', Response::HTTP_UNAUTHORIZED);
+            }
 
-            // $token->update([
-            //     'is_verified' => true
-            // ]);
+            $token->update([
+                'is_verified' => true
+            ]);
 
             return $this->sendResponse([], "Phone number verified successful", Response::HTTP_OK);
         } catch (\Exception $e) {

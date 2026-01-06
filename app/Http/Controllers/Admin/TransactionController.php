@@ -39,8 +39,11 @@ class TransactionController extends Controller
         return view('admin.transaction._table', $data);
     }
 
-    function show(Transaction $transaction)
+    function show($transaction)
     {
+
+        $transaction = Transaction::whereUuid($transaction)->first();
+
         $data['transaction'] = $transaction;
 
         return view('admin.transaction.show', $data);

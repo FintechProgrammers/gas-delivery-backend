@@ -37,7 +37,25 @@ class OrderController extends Controller
 
     function show(GasOrder $order)
     {
+        // Get completed milestones
+        $completedMilestones = $order->timeline->pluck('status')->toArray();
+
+        $milestones = milestones();
+
+        // Prepare timeline data
+        $timelineData = [];
+        foreach ($milestones as $status => $data) {
+            $timelineData[] = [
+                'label' => $data['label'],
+                'status' => $status,
+                'description' => $data['description'], // Add description here
+                'completed' => in_array($status, $completedMilestones),
+                'timestamp' => $order->timeline->where('status', $status)->first()->status_time ?? null,
+            ];
+        }
+
         $data['order'] = $order;
+        $data['timeline'] = $timelineData;
 
         return view('admin.orders.show', $data);
     }

@@ -13,6 +13,8 @@
 
             @include('admin.orders._vendor-information')
 
+            @include('admin.orders._order-timeline')
+
             {{-- <div class="card">
                 <div class="card-header">
                     <div class="row align-items-center">
