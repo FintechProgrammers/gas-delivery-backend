@@ -27,8 +27,7 @@ class OrderController extends Controller
 
         $query->when(!empty($search), fn($query) => $query->where('reference', 'LIKE', "%{$search}%"))
             ->when(!empty($status), fn($query) => $query->where('status', $status))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['orders'] = $query->paginate(50);
 

@@ -1,5 +1,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let areaChart = null;
+
         // Function to fetch data and update charts using AJAX
         function fetchChartData(period) {
             $.ajax({
@@ -77,13 +79,13 @@
                             dashArray: [0, 0],
                             lineCap: "round"
                         },
-                        labels: data.monthDataSeries1.dates, // Use dynamic dates
+                        labels: data.monthDataSeries1.dates,
                         yaxis: {
                             labels: {
                                 offsetX: -12,
                                 offsetY: 0,
                                 formatter: function(value) {
-                                    return "₦" + value;
+                                    return "₦" + value.toLocaleString();
                                 }
                             }
                         },
@@ -116,104 +118,15 @@
                         }
                     };
 
-                    // Update bar chart
-                    const barOptions = {
-                        series: [{
-                            name: "Visitors",
-                            data: data.visitors.data
-                        }],
-                        chart: {
-                            height: 232,
-                            type: "bar",
-                            toolbar: {
-                                show: false
-                            }
-                        },
-                        fill: {
-                            type: "gradient",
-                            gradient: {
-                                shadeIntensity: 1,
-                                opacityFrom: 0.7,
-                                opacityTo: 1,
-                                colorStops: [{
-                                        offset: 0,
-                                        color: "rgba(106, 155, 155, 0.4)",
-                                        opacity: 1
-                                    },
-                                    {
-                                        offset: 100,
-                                        color: "rgba(106, 155, 155, 0.4)",
-                                        opacity: 1
-                                    }
-                                ]
-                            }
-                        },
-                        plotOptions: {
-                            bar: {
-                                columnWidth: "55%",
-                                endingShape: "rounded",
-                                borderRadius: 5
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        legend: {
-                            show: false
-                        },
-                        yaxis: {
-                            labels: {
-                                show: false
-                            }
-                        },
-                        grid: {
-                            strokeDashArray: 3,
-                            xaxis: {
-                                lines: {
-                                    show: false
-                                }
-                            },
-                            yaxis: {
-                                lines: {
-                                    show: false
-                                }
-                            }
-                        },
-                        xaxis: {
-                            type: "category",
-                            categories: data.visitors.categories,
-                            axisBorder: {
-                                show: false,
-                                color: "rgba(119, 119, 142, 0.05)",
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            axisTicks: {
-                                show: false,
-                                borderType: "solid",
-                                color: "rgba(119, 119, 142, 0.05)",
-                                width: 6,
-                                offsetX: 0,
-                                offsetY: 0
-                            },
-                            labels: {
-                                rotate: -90,
-                                style: {
-                                    colors: "rgb(107, 114, 128)",
-                                    fontSize: "12px"
-                                }
-                            }
-                        }
-                    };
+                    // Destroy existing chart before creating new one
+                    if (areaChart !== null) {
+                        areaChart.destroy();
+                    }
 
-                    // Render or update charts
-                    const areaChart = new ApexCharts(document.querySelector("#audience_overview"),
+                    // Render new chart
+                    areaChart = new ApexCharts(document.querySelector("#audience_overview"),
                         areaOptions);
                     areaChart.render();
-
-                    // If you have a separate div for the bar chart, render it there
-                    // const bar下一行Chart = new ApexCharts(document.querySelector("#visitors_chart"), barOptions);
-                    // barChart.render();
                 },
                 error: function(xhr, status, error) {
                     console.log('Error fetching chart data:', error);
@@ -237,6 +150,8 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        let customersChart = null;
+
         // Function to fetch data and update chart using AJAX
         function fetchChartData(period) {
             $.ajax({
@@ -291,10 +206,15 @@
                         }
                     };
 
-                    // Render or update chart
-                    const chart = new ApexCharts(document.querySelector("#customers-line"),
+                    // Destroy existing chart before creating new one
+                    if (customersChart !== null) {
+                        customersChart.destroy();
+                    }
+
+                    // Render new chart
+                    customersChart = new ApexCharts(document.querySelector("#customers-line"),
                         chartOptions);
-                    chart.render();
+                    customersChart.render();
                 },
                 error: function(xhr, status, error) {
                     console.log('Error fetching chart data:', error);

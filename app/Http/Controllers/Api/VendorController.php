@@ -75,9 +75,6 @@ class VendorController extends Controller
             $query->where('users.business_name', 'like', '%' . $search . '%');
         }
 
-        $query->having('distance', '<=', $maxDistance)  // Filter by max distance
-            ->orderBy('distance', 'asc'); // Sort by distance ascending
-
         // Get the data and convert it to a collection of model instances
         $results = $query->get();
 

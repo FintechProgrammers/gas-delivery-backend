@@ -26,12 +26,13 @@ class CustomerController extends Controller
         $query = User::where('account_type', 'CUSTOMER')->withTrashed();
 
         $query = $query
-            ->when(!empty($search), fn($query) => $query->where('first_name', 'LIKE', "%{$search}%")
-                ->orWhere('last_name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%"))
+            ->when(!empty($search), fn($query) => $query->where(function ($q) use ($search) {
+                $q->where('first_name', 'LIKE', "%{$search}%")
+                    ->orWhere('last_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%");
+            }))
             ->when(!empty($status), fn($query) => $query->where('status', $status))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['users'] = $query->paginate(50);
 

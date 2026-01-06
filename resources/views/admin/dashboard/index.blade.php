@@ -50,6 +50,17 @@
                                     <a class="dropdown-item rev" href="#" data-period="Last Week">Last Week</a>
                                     <a class="dropdown-item rev" href="#" data-period="Last Month">Last Month</a>
                                     <a class="dropdown-item rev" href="#" data-period="This Year">This Year</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item rev" href="#" data-period="All Time">All Time</a>
+                                    @if(!empty($availableYears))
+                                        <div class="dropdown-divider"></div>
+                                        <h6 class="dropdown-header">Previous Years</h6>
+                                        @foreach($availableYears as $year)
+                                            @if($year != date('Y'))
+                                                <a class="dropdown-item rev" href="#" data-period="{{ $year }}">{{ $year }}</a>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -81,6 +92,17 @@
                                     <a class="dropdown-item cus" href="#" data-period="Last Week">Last Week</a>
                                     <a class="dropdown-item cus" href="#" data-period="Last Month">Last Month</a>
                                     <a class="dropdown-item cus" href="#" data-period="This Year">This Year</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item cus" href="#" data-period="All Time">All Time</a>
+                                    @if(!empty($availableYears))
+                                        <div class="dropdown-divider"></div>
+                                        <h6 class="dropdown-header">Previous Years</h6>
+                                        @foreach($availableYears as $year)
+                                            @if($year != date('Y'))
+                                                <a class="dropdown-item cus" href="#" data-period="{{ $year }}">{{ $year }}</a>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </div>
                             </div>
                         </div>

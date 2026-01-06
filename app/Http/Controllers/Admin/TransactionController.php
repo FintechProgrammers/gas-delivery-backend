@@ -29,10 +29,9 @@ class TransactionController extends Controller
 
         $query->when(!empty($search), fn($query) => $query->where('reference', 'LIKE', "%{$search}%"))
             ->when(!empty($status), fn($query) => $query->where('status', $status))
-            ->when(!empty($action), fn($query) => $query->where('action', $status))
+            ->when(!empty($action), fn($query) => $query->where('action', $action))
             ->when(!empty($type), fn($query) => $query->where('type', $type))
-            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]))
-            ->when(!empty($status) && !empty($dateFrom) && !empty($dateTo), fn($query) => $query->where('status', $status)->whereBetween('created_at', [$dateFrom, $dateTo]));
+            ->when(!empty($dateFrom) && !empty($dateTo), fn($query) => $query->whereBetween('created_at', [$dateFrom, $dateTo]));
 
         $data['transactions'] = $query->paginate(50);
 

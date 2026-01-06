@@ -21,8 +21,43 @@ class DashboardController extends Controller
     public function index()
     {
         $data['stats'] = $this->statistics();
+        $data['availableYears'] = $this->getAvailableYears();
 
         return view('admin.dashboard.index', $data);
+    }
+
+    /**
+     * Get all years that have data available.
+     *
+     * @return array
+     */
+    private function getAvailableYears()
+    {
+        $years = [];
+
+        // Get years from GasOrders
+        $orderYears = GasOrder::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        // Get years from Transactions
+        $transactionYears = Transaction::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        // Get years from Users
+        $userYears = User::selectRaw('DISTINCT YEAR(created_at) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        // Merge and get unique years
+        $years = array_unique(array_merge($orderYears, $transactionYears, $userYears));
+        rsort($years);
+
+        return $years;
     }
 
     /**
@@ -116,28 +151,58 @@ class DashboardController extends Controller
         ];
 
         // Define date range based on period
-        switch ($period) {
-            case 'Today':
-                $startDate = Carbon::today();
-                $endDate = Carbon::today();
-                $days = 1; // Single day for short series
-                break;
-            case 'Last Week':
-                $startDate = Carbon::now()->subWeek();
+        if ($period === 'All Time') {
+            // Get the earliest record date from both tables
+            $earliestOrder = GasOrder::orderBy('created_at', 'asc')->first();
+            $earliestTransaction = Transaction::orderBy('created_at', 'asc')->first();
+
+            $earliestDate = null;
+            if ($earliestOrder && $earliestTransaction) {
+                $earliestDate = $earliestOrder->created_at->lt($earliestTransaction->created_at)
+                    ? $earliestOrder->created_at
+                    : $earliestTransaction->created_at;
+            } elseif ($earliestOrder) {
+                $earliestDate = $earliestOrder->created_at;
+            } elseif ($earliestTransaction) {
+                $earliestDate = $earliestTransaction->created_at;
+            }
+
+            $startDate = $earliestDate ? $earliestDate->copy()->startOfDay() : Carbon::now()->startOfYear();
+            $endDate = Carbon::now();
+            $days = 20;
+        } elseif (preg_match('/^\d{4}$/', $period)) {
+            // Handle specific year (e.g., "2024", "2023")
+            $year = (int)$period;
+            $startDate = Carbon::createFromDate($year, 1, 1)->startOfDay();
+            $endDate = Carbon::createFromDate($year, 12, 31)->endOfDay();
+            if ($endDate->isFuture()) {
                 $endDate = Carbon::now();
-                $days = 7; // Last 7 days
-                break;
-            case 'Last Month':
-                $startDate = Carbon::now()->subMonth();
-                $endDate = Carbon::now();
-                $days = 20; // Last 20 days for short series
-                break;
-            case 'This Year':
-            default:
-                $startDate = Carbon::now()->startOfYear();
-                $endDate = Carbon::now();
-                $days = 20; // Last 20 days for short series, full year for long series
-                break;
+            }
+            $days = 20;
+        } else {
+            switch ($period) {
+                case 'Today':
+                    $startDate = Carbon::today();
+                    $endDate = Carbon::today();
+                    $days = 1;
+                    break;
+                case 'Last Week':
+                    $startDate = Carbon::now()->subWeek();
+                    $endDate = Carbon::now();
+                    $days = 7;
+                    break;
+                case 'Last Month':
+                    $startDate = Carbon::now()->subMonth();
+                    $endDate = Carbon::now();
+                    $days = 20;
+                    break;
+                case 'This Year':
+                default:
+                    $startDate = Carbon::now()->startOfYear();
+                    $endDate = Carbon::now();
+                    $days = 20;
+                    break;
+            }
         }
 
         // monthDataSeries1: Income (e.g., completed order amounts)
@@ -167,9 +232,9 @@ class DashboardController extends Controller
 
         // Visitors: Daily user activity (e.g., user logins or registrations per day of week)
         $visitorData = User::whereBetween('created_at', [$startDate, $endDate])
-            ->selectRaw('DAYNAME(created_at) as day, COUNT(*) as count')
-            ->groupBy('day')
-            ->orderByRaw("FIELD(day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')")
+            ->selectRaw('DAYOFWEEK(created_at) as day_num, COUNT(*) as count')
+            ->groupBy('day_num')
+            ->orderBy('day_num')
             ->get();
 
         // Fill short-term series (monthDataSeries1 and monthDataSeries2)
@@ -204,9 +269,9 @@ class DashboardController extends Controller
         }
 
         // Fill visitors data (weekly)
-        $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        foreach ($daysOfWeek as $day) {
-            $visitor = $visitorData->firstWhere('day', $day);
+        // DAYOFWEEK returns 1=Sunday, 2=Monday, ..., 7=Saturday
+        for ($i = 1; $i <= 7; $i++) {
+            $visitor = $visitorData->firstWhere('day_num', $i);
             $response['visitors']['data'][] = $visitor ? (int)$visitor->count : 0;
         }
 
@@ -234,32 +299,60 @@ class DashboardController extends Controller
         ];
 
         // Define date range based on period
-        switch ($period) {
-            case 'Today':
-                $startDate = Carbon::today();
-                $endDate = Carbon::today();
-                break;
-            case 'Last Week':
-                $startDate = Carbon::now()->startOfWeek()->subWeek();
-                $endDate = Carbon::now()->endOfWeek()->subWeek();
-                break;
-            case 'Last Month':
-                $startDate = Carbon::now()->subMonth()->startOfMonth();
-                $endDate = Carbon::now()->subMonth()->endOfMonth();
-                break;
-            case 'This Year':
-            default:
-                $startDate = Carbon::now()->startOfYear();
+        if ($period === 'All Time') {
+            // Get the earliest user and order date
+            $earliestUser = User::orderBy('created_at', 'asc')->first();
+            $earliestOrder = GasOrder::orderBy('created_at', 'asc')->first();
+
+            $earliestDate = null;
+            if ($earliestUser && $earliestOrder) {
+                $earliestDate = $earliestUser->created_at->lt($earliestOrder->created_at)
+                    ? $earliestUser->created_at
+                    : $earliestOrder->created_at;
+            } elseif ($earliestUser) {
+                $earliestDate = $earliestUser->created_at;
+            } elseif ($earliestOrder) {
+                $earliestDate = $earliestOrder->created_at;
+            }
+
+            $startDate = $earliestDate ? $earliestDate->copy()->startOfDay() : Carbon::now()->startOfYear();
+            $endDate = Carbon::now();
+        } elseif (preg_match('/^\d{4}$/', $period)) {
+            // Handle specific year (e.g., "2024", "2023")
+            $year = (int)$period;
+            $startDate = Carbon::createFromDate($year, 1, 1)->startOfDay();
+            $endDate = Carbon::createFromDate($year, 12, 31)->endOfDay();
+            if ($endDate->isFuture()) {
                 $endDate = Carbon::now();
-                break;
+            }
+        } else {
+            switch ($period) {
+                case 'Today':
+                    $startDate = Carbon::today();
+                    $endDate = Carbon::today();
+                    break;
+                case 'Last Week':
+                    $startDate = Carbon::now()->startOfWeek()->subWeek();
+                    $endDate = Carbon::now()->endOfWeek()->subWeek();
+                    break;
+                case 'Last Month':
+                    $startDate = Carbon::now()->subMonth()->startOfMonth();
+                    $endDate = Carbon::now()->subMonth()->endOfMonth();
+                    break;
+                case 'This Year':
+                default:
+                    $startDate = Carbon::now()->startOfYear();
+                    $endDate = Carbon::now();
+                    break;
+            }
         }
 
         // New Customers: Count users created per day of the week, filtered by account_type
         $newCustomers = User::whereIn('account_type', ['BUSINESS', 'CUSTOMER', 'RIDER'])
             ->whereBetween('users.created_at', [$startDate, $endDate])
-            ->selectRaw('DAYNAME(users.created_at) as day, COUNT(*) as count')
-            ->groupBy('day')
-            ->orderByRaw("FIELD(day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')")
+            ->selectRaw('DAYOFWEEK(users.created_at) as day_num, COUNT(*) as count')
+            ->groupBy('day_num')
+            ->orderBy('day_num')
             ->get();
 
         // Returning Customers: Count distinct users with orders (excluding new users in the period)
@@ -267,21 +360,21 @@ class DashboardController extends Controller
             ->join('users', 'gas_orders.user_id', '=', 'users.id')
             ->whereIn('users.account_type', ['BUSINESS', 'CUSTOMER', 'RIDER'])
             ->where('users.created_at', '<', $startDate)
-            ->whereNull('gas_orders.deleted_at') // Handle soft deletes
-            ->selectRaw('DAYNAME(gas_orders.created_at) as day, COUNT(DISTINCT users.id) as count')
-            ->groupBy('day')
-            ->orderByRaw("FIELD(day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')")
+            ->whereNull('gas_orders.deleted_at')
+            ->selectRaw('DAYOFWEEK(gas_orders.created_at) as day_num, COUNT(DISTINCT users.id) as count')
+            ->groupBy('day_num')
+            ->orderBy('day_num')
             ->get();
 
         // Fill data for each day of the week
-        $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-        foreach ($daysOfWeek as $day) {
+        // DAYOFWEEK returns 1=Sunday, 2=Monday, ..., 7=Saturday
+        for ($i = 1; $i <= 7; $i++) {
             // New Customers
-            $newCustomer = $newCustomers->firstWhere('day', $day);
+            $newCustomer = $newCustomers->firstWhere('day_num', $i);
             $response['series'][0]['data'][] = $newCustomer ? (int)$newCustomer->count : 0;
 
             // Returning Customers
-            $returningCustomer = $returningCustomers->firstWhere('day', $day);
+            $returningCustomer = $returningCustomers->firstWhere('day_num', $i);
             $response['series'][1]['data'][] = $returningCustomer ? (int)$returningCustomer->count : 0;
         }
 
